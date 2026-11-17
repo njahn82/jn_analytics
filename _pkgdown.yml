@@ -1,3 +1,5 @@
+url: https://njahn82.github.io/jn_analytics/
+
 template:
   bootstrap: 5
   bootswatch: cosmo
@@ -12,18 +14,18 @@ template:
 
 home:
   sidebar:
-    structure: [links, license, citation, authors, dev, custom]
-    components:
-      custom:
-        title: Funding
-        text: Funded by the [Deutsche Forschungsgemeinschaft](https://gepris.dfg.de/gepris/projekt/416115939?context=projekt&task=showDetail&id=416115939&).
+    structure: [links, license, citation, authors, dev]
 
 navbar:
   bg: primary
   type: light
   structure:
-    left: [intro, reference, articles, news]
+    left: [intro, data, reference, articles, news]
     right: [search]
+  components:
+    data:
+      text: Download
+      href: articles/data.html
 
 footer:
   structure:
@@ -32,9 +34,10 @@ footer:
     legal: Developed at the [State and University Library Göttingen (SUB Göttingen)](https://www.sub.uni-goettingen.de/sub-aktuell/) | [Impressum](https://www.sub.uni-goettingen.de/impressum/)
 
 articles:
-  - title: Data model
+  - title: Data
     navbar: ~
     contents:
+      - articles/data
       - data-model
 
 reference:

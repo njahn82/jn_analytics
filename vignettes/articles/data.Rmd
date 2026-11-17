@@ -1,0 +1,135 @@
+---
+title: "Download the data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, comment = "#>")
+library(jnanalytics)
+parquet_dir <- file.path("..", "..", "parquet")
+base_url <- "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/"
+release <- as.data.frame(arrow::read_parquet(file.path(parquet_dir, "release.parquet")))
+```
+
+The reference tables and journal-level aggregates are published as
+[Parquet](https://parquet.apache.org/) files with every release. They are kept
+in the [`parquet/`](https://github.com/njahn82/jn_analytics/tree/main/parquet)
+folder of the repository and can be read without an account or API key, in R,
+Python, DuckDB or any other tool that reads Parquet. Article-level tables
+(`articles`, `article_first_authors`, `article_agreements`) are only in
+BigQuery, `subugoe-collaborative.jn_analytics`.
+
+Data and code are released under CC0.
+
+## Current release
+
+```{r}
+knitr::kable(
+  tibble::tibble(
+    Item = c(
+      "Version", "Built", "Crossref snapshot", "OpenAlex snapshot",
+      "JCT snapshot", "Publication years"
+    ),
+    Value = c(
+      release$version, format(release$snapshot_date), release$crossref_snapshot,
+      release$openalex_snapshot, release$jct_snapshot,
+      paste(release$pub_year_min, release$pub_year_max, sep = "–")
+    )
+  )
+)
+```
+
+The links below always point to the latest release. Earlier releases are in
+the [history of `parquet/`](https://github.com/njahn82/jn_analytics/commits/main/parquet).
+
+## Files
+
+```{r}
+tables <- c(jn_publish_tables(), "release")
+files <- paste0(tables, ".parquet")
+paths <- file.path(parquet_dir, files)
+stopifnot(all(file.exists(paths)))
+rows <- vapply(paths, function(p) nrow(arrow::open_dataset(p)), numeric(1))
+size_mb <- file.size(paths) / 1e6
+knitr::kable(
+  tibble::tibble(
+    Table = paste0("[`", tables, "`](data-model.html#", gsub("_", "-", tables), ")"),
+    Rows = format(rows, big.mark = ","),
+    Size = ifelse(size_mb < 0.1, "< 0.1 MB", sprintf("%.1f MB", size_mb)),
+    Download = paste0("[", files, "](", base_url, files, ")")
+  ),
+  align = c("l", "r", "r", "l")
+)
+```
+
+Every table and column is described in the [data model](data-model.html),
+including the counting rules. Two matter most when working with the files:
+
+- Counts can be summed over journals, years and work types; compute shares
+  from the sums. Filter `work_type` to `article` and `review` for research
+  articles.
+- The country tables count a work once per first-author country (full
+  counting). Take totals from `journal_year`, never by summing over countries.
+
+## Usage
+
+### R, with jnanalytics
+
+Download all files into one folder and use the analysis functions:
+
+```{r, echo = TRUE, eval = FALSE}
+library(jnanalytics)
+
+base_url <- "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/"
+files <- paste0(c(jn_publish_tables(), "release"), ".parquet")
+dir.create("jn_parquet")
+for (f in files) {
+  download.file(paste0(base_url, f), file.path("jn_parquet", f), mode = "wb")
+}
+
+src <- jn_source("jn_parquet")
+jn_oa(src, by = c("pub_year", "oa_model"))
+```
+
+### R, with arrow
+
+```{r, echo = TRUE, eval = FALSE}
+download.file(
+  "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet",
+  "journal_year.parquet", mode = "wb"
+)
+journal_year <- arrow::read_parquet("journal_year.parquet")
+```
+
+### Python
+
+```python
+import pandas as pd
+
+url = "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet"
+journal_year = pd.read_parquet(url)
+```
+
+### DuckDB
+
+DuckDB reads the files directly from their URL:
+
+```sql
+SELECT pub_year, oa_model,
+       sum(articles) AS articles,
+       sum(articles_oa) / sum(articles) AS share_oa
+FROM 'https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet'
+WHERE work_type IN ('article', 'review')
+GROUP BY ALL
+ORDER BY ALL;
+```
+
+## Column descriptions in the files
+
+Each file carries its column descriptions as JSON in the Parquet metadata
+(`jn_columns`), together with the table name (`jn_table`) and the package
+version (`jn_version`):
+
+```{r, echo = TRUE, eval = FALSE}
+meta <- arrow::open_dataset("journal_year.parquet")$schema$metadata
+jsonlite::fromJSON(meta$jn_columns)
+```

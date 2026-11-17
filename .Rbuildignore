@@ -12,3 +12,4 @@
 ^pkgdown$
 ^CLAUDE\.md$
 ^\.claude$
+^vignettes/articles$

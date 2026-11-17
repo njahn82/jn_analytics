@@ -21,6 +21,9 @@ unchanged for code that relies on its tables.
 * pkgdown website with a README home page and a "Data model" article that
   documents every table, column and counting rule from the schema; deployed
   to GitHub Pages by `pkgdown.yaml`.
+* The Parquet export is kept in `parquet/` of the repository, one version per
+  release, and listed with download links and usage examples on the
+  website's "Download the data" page.
 * `normalize_ror()` brings ROR IDs into one canonical form.
 * A CC licence counts for the version of record whatever its start date in
   Crossref (`delay_in_days` is ignored), as in hoaddata 0.3.
