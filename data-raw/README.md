@@ -17,6 +17,7 @@ source("data-raw/reference.R")
 | `openalex_sources.csv` | OpenAlex journals sharing an ISSN with the JCT lists: ISSNs, ISSN-L, title, `is_oa`, `is_in_doaj`, `oa_flip_year`. Primary source for ISSN-Ls and `oa_model` | `jn_fetch_openalex_sources()`, `openalex_walden.sources` |
 | `manual/exclusions.csv` | Agreements to drop, with a reason | curated |
 | `manual/oa_model.csv` | Journals with a known OA model (`hybrid` or `full_oa`), with a reason. Overrides any automatic classification | curated |
+| `manual/oa_flips.csv` | Publishers that turned all their journals fully OA, with the first fully OA year (`full_oa_from`) and a source. Their hybrid and unclassified journals become `full_oa` with `oa_flip_year = full_oa_from - 1` | curated |
 | `manual/publisher_names.csv` | Publisher name variants → normalised name | curated |
 | `manual/agreement_publishers.csv` | Publisher for ESAC ID prefixes missing from `esac_df.csv` | curated |
 | `manual/portfolios.csv` | Dashboard publisher pages (replaces the JCT part of hoaddash `config.csv`) | curated |

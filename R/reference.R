@@ -18,8 +18,8 @@
 #'   OpenAlex IDs and `oa_model` come from here; ISSNs that OpenAlex does not
 #'   know fall back to the legacy file.
 #' - `legacy/journal_titles.csv`: fallback journal titles.
-#' - `manual/*.csv`: curated lookups (publisher names, OA models, exclusions,
-#'   portfolios).
+#' - `manual/*.csv`: curated lookups (publisher names, OA models, publishers
+#'   that flipped their journals to open access, exclusions, portfolios).
 #'
 #' @param raw_dir Directory with the raw files.
 #' @param quiet If `FALSE`, report coverage diagnostics.
@@ -56,7 +56,11 @@ jn_update_reference <- function(raw_dir = "data-raw", quiet = FALSE) {
     issn_map = issn_map,
     legacy_titles = inputs$legacy_titles,
     oa_models = inputs$oa_models,
-    openalex = inputs$openalex
+    openalex = inputs$openalex,
+    oa_flips = dplyr::mutate(
+      inputs$oa_flips,
+      publisher = normalize_publisher(.data$publisher, inputs$publisher_names)
+    )
   )
   journal_issns <- build_journal_issns(issn_map, journals)
   portfolios <- build_portfolios(
@@ -165,6 +169,10 @@ read_reference_inputs <- function(raw_dir) {
     legacy_titles = read("legacy/journal_titles.csv", col_types = chr),
     exclusions = read("manual/exclusions.csv", col_types = chr),
     oa_models = read("manual/oa_model.csv", col_types = chr),
+    oa_flips = read("manual/oa_flips.csv", col_types = readr::cols(
+      full_oa_from = readr::col_integer(),
+      .default = readr::col_character()
+    )),
     publisher_names = read("manual/publisher_names.csv", col_types = chr),
     agreement_publishers = read("manual/agreement_publishers.csv", col_types = chr),
     portfolios = read("manual/portfolios.csv", col_types = chr),
@@ -382,9 +390,14 @@ build_agreement_institutions <- function(jct_inst, legacy_inst, agreement_ids) {
 # frequent JCT title, then the legacy title. `oa_model`: the curated list
 # first, then `full_oa` if OpenAlex marks the source as OA or in DOAJ,
 # `hybrid` if it is in OpenAlex otherwise, and `NA` if not in OpenAlex.
+# Publishers in `oa_flips` turned all their journals fully OA from
+# `full_oa_from`: their hybrid and unclassified journals become `full_oa`
+# with `oa_flip_year` the year before, so they count as hybrid up to then.
+# Journals that were already fully OA keep their flip year.
 build_journals <- function(agreement_journals, agreements, jct_jn, issn_map,
                            legacy_titles, oa_models,
-                           openalex = empty_openalex_sources()) {
+                           openalex = empty_openalex_sources(),
+                           oa_flips = tibble::tibble(publisher = character(), full_oa_from = integer())) {
   oalex <- openalex |>
     dplyr::mutate(issn_l = normalize_issn(.data$issn_l)) |>
     dplyr::arrange(.data$issn_l, dplyr::desc(.data$works_count)) |>
@@ -425,7 +438,11 @@ build_journals <- function(agreement_journals, agreements, jct_jn, issn_map,
       oa_model = dplyr::coalesce(
         oa_models$oa_model[match(.data$issn_l, oa_models$issn_l)],
         .data$oa_model_openalex
-      )
+      ),
+      full_oa_from = oa_flips$full_oa_from[match(.data$publisher, oa_flips$publisher)],
+      flipped = !is.na(.data$full_oa_from) & dplyr::coalesce(.data$oa_model, "hybrid") == "hybrid",
+      oa_model = dplyr::if_else(.data$flipped, "full_oa", .data$oa_model),
+      oa_flip_year = dplyr::if_else(.data$flipped, .data$full_oa_from - 1L, .data$oa_flip_year)
     ) |>
     dplyr::select(dplyr::all_of(jn_schema("journals")$column))
 }

@@ -35,6 +35,8 @@ unchanged for code that relies on its tables.
 * All journal-year aggregates carry a year-aware `oa_model`: a journal counts
   as hybrid up to and including its OpenAlex `oa_flip_year` (a transition
   year) and as fully OA afterwards.
+* Publisher-wide flips to open access are curated in
+  `data-raw/manual/oa_flips.csv`. ACM journals count as fully OA from 2026.
 * `jn_oa()`, `jn_licenses()` and `jn_metadata()` give journal-level statistics
   per agreement: `by = "agreement_id"` and `agreement = <ESAC IDs>` cover all
   works in an agreement's journals, by default only in the years the agreement

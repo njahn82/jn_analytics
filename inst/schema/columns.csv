@@ -2,8 +2,8 @@ table,column,type,key,references,description
 journals,issn_l,string,TRUE,,Linking ISSN
 journals,title,string,FALSE,,"Journal title (OpenAlex, else the Journal Checker Tool)"
 journals,publisher,string,FALSE,,"Normalised publisher name, e.g. `Wiley`"
-journals,oa_model,string,FALSE,,"Current OA model: `hybrid` or `full_oa` (fully open access, according to OpenAlex or the curated list); `NA` = not in OpenAlex. The aggregates carry a year-aware `oa_model` that uses `oa_flip_year`"
-journals,oa_flip_year,integer,FALSE,,Year the journal became fully OA according to OpenAlex; `NA` if unknown or never. This and earlier years count as hybrid in the aggregates
+journals,oa_model,string,FALSE,,"Current OA model: `hybrid` or `full_oa` (fully open access, according to OpenAlex, the curated list or a publisher-wide flip in `data-raw/manual/oa_flips.csv`); `NA` = not in OpenAlex. The aggregates carry a year-aware `oa_model` that uses `oa_flip_year`"
+journals,oa_flip_year,integer,FALSE,,"Year the journal became fully OA according to OpenAlex, or for a publisher-wide flip the year before it took effect; `NA` if unknown or never. This and earlier years count as hybrid in the aggregates"
 journals,openalex_source_id,string,FALSE,,OpenAlex source ID
 journal_issns,issn,string,TRUE,,Any ISSN of the journal
 journal_issns,issn_l,string,FALSE,journals.issn_l,Linking ISSN it belongs to

@@ -68,7 +68,8 @@ pkgdown::build_site()                # website into docs/
   metadata indicator in fully OA journals).
 - Country-agnostic: no `scope`; country tables use full counting.
 - `oa_model` per year: hybrid up to and including the OpenAlex
-  `oa_flip_year`, fully OA afterwards.
+  `oa_flip_year`, fully OA afterwards. Publisher-wide flips (ACM from 2026)
+  are curated in `data-raw/manual/oa_flips.csv`.
 - Agreement coverage: first author; `direct`, `child` and `parent` ROR
   matches count, `related` is stored but not counted; the period is checked
   with the OpenAlex publication date only.

@@ -35,7 +35,7 @@ status, written by \code{\link[=jn_fetch_openalex_sources]{jn_fetch_openalex_sou
 OpenAlex IDs and \code{oa_model} come from here; ISSNs that OpenAlex does not
 know fall back to the legacy file.
 \item \code{legacy/journal_titles.csv}: fallback journal titles.
-\item \verb{manual/*.csv}: curated lookups (publisher names, OA models, exclusions,
-portfolios).
+\item \verb{manual/*.csv}: curated lookups (publisher names, OA models, publishers
+that flipped their journals to open access, exclusions, portfolios).
 }
 }

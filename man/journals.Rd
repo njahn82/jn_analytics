@@ -10,8 +10,8 @@ A tibble with 6 columns:
 \item \code{issn_l} (string, key): Linking ISSN
 \item \code{title} (string): Journal title (OpenAlex, else the Journal Checker Tool)
 \item \code{publisher} (string): Normalised publisher name, e.g. \code{Wiley}
-\item \code{oa_model} (string): Current OA model: \code{hybrid} or \code{full_oa} (fully open access, according to OpenAlex or the curated list); \code{NA} = not in OpenAlex. The aggregates carry a year-aware \code{oa_model} that uses \code{oa_flip_year}
-\item \code{oa_flip_year} (integer): Year the journal became fully OA according to OpenAlex; \code{NA} if unknown or never. This and earlier years count as hybrid in the aggregates
+\item \code{oa_model} (string): Current OA model: \code{hybrid} or \code{full_oa} (fully open access, according to OpenAlex, the curated list or a publisher-wide flip in \code{data-raw/manual/oa_flips.csv}); \code{NA} = not in OpenAlex. The aggregates carry a year-aware \code{oa_model} that uses \code{oa_flip_year}
+\item \code{oa_flip_year} (integer): Year the journal became fully OA according to OpenAlex, or for a publisher-wide flip the year before it took effect; \code{NA} if unknown or never. This and earlier years count as hybrid in the aggregates
 \item \code{openalex_source_id} (string): OpenAlex source ID
 }
 }

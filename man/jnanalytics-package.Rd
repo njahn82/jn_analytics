@@ -8,6 +8,15 @@
 \description{
 Builds and documents a tidy data model about scholarly journals covered by transformative agreements, distinguishing hybrid from fully open access journals. Reference tables describe journals, agreements and dashboard portfolios once; article-level and journal-level count tables are built in Google BigQuery from Crossref and OpenAlex, using journal lists from the cOAlition S Journal Checker Tool and the ESAC registry. Successor of the 'hoaddata' package.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/njahn82/jn_analytics}
+  \item \url{https://njahn82.github.io/jn_analytics/}
+  \item Report bugs at \url{https://github.com/njahn82/jn_analytics/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Najko Jahn \email{najko.jahn@sub.uni-goettingen.de} (\href{https://orcid.org/0000-0001-5105-1463}{ORCID})
 

@@ -72,6 +72,9 @@ knitr::kable(
   OpenAlex (`is_oa` or DOAJ) or the curated list. The aggregates carry an
   `oa_model` per year: a journal counts as hybrid up to and including its
   OpenAlex `oa_flip_year`, a transition year, and as fully OA afterwards.
+  Publishers that turned all their journals fully OA at once are listed in
+  `data-raw/manual/oa_flips.csv` (for example ACM from 2026); their hybrid
+  journals count as hybrid up to the year before and fully OA from then on.
 - **Countries.** First-author countries from OpenAlex, with full counting: a
   work with first-author affiliations in two countries counts in both. Take
   journal totals from `journal_year`, never by summing over countries.

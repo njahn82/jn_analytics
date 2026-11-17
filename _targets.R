@@ -111,9 +111,16 @@ list(
   # One upload per reference table, returning a hash of its content, so a
   # change in one table only reruns the BigQuery steps that read it
   lapply(reference_tables, upload_step),
+  # `articles` only reads the list of journals (`issn_l`), so it depends on
+  # this hash rather than on the whole `journals` table: a change of OA model
+  # or flip year reruns the aggregates, not the article tables
+  tar_target(journal_ids, {
+    upload_journals
+    rlang::hash(sort(reference$journals$issn_l))
+  }),
 
   # BigQuery tables, in dependency order
-  bq_step("articles", c("sql_articles", "upload_journals", "snapshots")),
+  bq_step("articles", c("sql_articles", "journal_ids", "snapshots")),
   bq_step("article_first_authors", c("sql_article_first_authors", "bq_articles", "snapshots")),
   bq_step("journal_year", c("sql_journal_year", "bq_articles", "upload_journals")),
   bq_step("journal_year_country", c("sql_journal_year_country", "bq_articles", "bq_article_first_authors", "upload_journals")),

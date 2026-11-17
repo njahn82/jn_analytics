@@ -84,6 +84,13 @@ test_that("build_journals() classifies OA models with curated values first", {
   expect_equal(out$oa_model, c(NA, "hybrid", "full_oa", "full_oa"))
   expect_equal(out$oa_flip_year, c(NA, NA, NA, 2024L))
   expect_equal(out$title, c(NA, "Surveys", "Open", "Inroads"))
+
+  # a publisher flip turns hybrid and unclassified journals fully OA; journals
+  # already fully OA keep their flip year
+  flips <- tibble::tibble(publisher = "ACM", full_oa_from = 2026L)
+  out <- build_journals(links, agreements, jct, map, titles, oa_models, openalex, flips)
+  expect_equal(out$oa_model, rep("full_oa", 4))
+  expect_equal(out$oa_flip_year, c(2025L, 2025L, NA, 2024L))
 })
 
 test_that("build_agreements() infers the period of agreements missing from ESAC", {
