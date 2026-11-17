@@ -52,6 +52,10 @@ stays available unchanged for code that relies on its tables.
   counts as hybrid up to and including its OpenAlex `oa_flip_year` (a
   transition year) and as fully OA afterwards.
 
+- Publisher-wide flips to open access are curated in
+  `data-raw/manual/oa_flips.csv`. ACM journals count as fully OA from
+  2026.
+
 - [`jn_oa()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md),
   [`jn_licenses()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)
   and

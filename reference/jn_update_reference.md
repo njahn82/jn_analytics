@@ -50,4 +50,5 @@ Expected files in `raw_dir` (see `data-raw/README.md`):
 - `legacy/journal_titles.csv`: fallback journal titles.
 
 - `manual/*.csv`: curated lookups (publisher names, OA models,
-  exclusions, portfolios).
+  publishers that flipped their journals to open access, exclusions,
+  portfolios).

@@ -21,12 +21,14 @@ A tibble with 6 columns:
 - `publisher` (string): Normalised publisher name, e.g. `Wiley`
 
 - `oa_model` (string): Current OA model: `hybrid` or `full_oa` (fully
-  open access, according to OpenAlex or the curated list); `NA` = not in
+  open access, according to OpenAlex, the curated list or a
+  publisher-wide flip in `data-raw/manual/oa_flips.csv`); `NA` = not in
   OpenAlex. The aggregates carry a year-aware `oa_model` that uses
   `oa_flip_year`
 
 - `oa_flip_year` (integer): Year the journal became fully OA according
-  to OpenAlex; `NA` if unknown or never. This and earlier years count as
+  to OpenAlex, or for a publisher-wide flip the year before it took
+  effect; `NA` if unknown or never. This and earlier years count as
   hybrid in the aggregates
 
 - `openalex_source_id` (string): OpenAlex source ID

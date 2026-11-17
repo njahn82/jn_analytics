@@ -55,8 +55,8 @@ Journal Checker Tool (JCT).</p>
     <p>A tibble with 6 columns:</p><ul><li><p><code>issn_l</code> (string, key): Linking ISSN</p></li>
 <li><p><code>title</code> (string): Journal title (OpenAlex, else the Journal Checker Tool)</p></li>
 <li><p><code>publisher</code> (string): Normalised publisher name, e.g. <code>Wiley</code></p></li>
-<li><p><code>oa_model</code> (string): Current OA model: <code>hybrid</code> or <code>full_oa</code> (fully open access, according to OpenAlex or the curated list); <code>NA</code> = not in OpenAlex. The aggregates carry a year-aware <code>oa_model</code> that uses <code>oa_flip_year</code></p></li>
-<li><p><code>oa_flip_year</code> (integer): Year the journal became fully OA according to OpenAlex; <code>NA</code> if unknown or never. This and earlier years count as hybrid in the aggregates</p></li>
+<li><p><code>oa_model</code> (string): Current OA model: <code>hybrid</code> or <code>full_oa</code> (fully open access, according to OpenAlex, the curated list or a publisher-wide flip in <code>data-raw/manual/oa_flips.csv</code>); <code>NA</code> = not in OpenAlex. The aggregates carry a year-aware <code>oa_model</code> that uses <code>oa_flip_year</code></p></li>
+<li><p><code>oa_flip_year</code> (integer): Year the journal became fully OA according to OpenAlex, or for a publisher-wide flip the year before it took effect; <code>NA</code> if unknown or never. This and earlier years count as hybrid in the aggregates</p></li>
 <li><p><code>openalex_source_id</code> (string): OpenAlex source ID</p></li>
 </ul></div>
     <div class="section level2">

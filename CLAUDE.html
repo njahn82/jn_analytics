@@ -77,7 +77,7 @@
 <li>OA: every work in a fully OA journal-year is OA (share 100%); in a hybrid journal-year, OA = CC licence in Crossref. <code>articles_oa</code> counts both; <code>articles_with_cc_license</code> is the Crossref licence evidence alone (a metadata indicator in fully OA journals).</li>
 <li>Country-agnostic: no <code>scope</code>; country tables use full counting.</li>
 <li>
-<code>oa_model</code> per year: hybrid up to and including the OpenAlex <code>oa_flip_year</code>, fully OA afterwards.</li>
+<code>oa_model</code> per year: hybrid up to and including the OpenAlex <code>oa_flip_year</code>, fully OA afterwards. Publisher-wide flips (ACM from 2026) are curated in <code>data-raw/manual/oa_flips.csv</code>.</li>
 <li>Agreement coverage: first author; <code>direct</code>, <code>child</code> and <code>parent</code> ROR matches count, <code>related</code> is stored but not counted; the period is checked with the OpenAlex publication date only.</li>
 <li>
 <code>portfolios</code> is one row per page and agreement (<code>agreement_id</code> = ESAC ID); a page’s journals come from <code>agreement_journals</code>. The ESAC IDs per page are essential to the user.</li>

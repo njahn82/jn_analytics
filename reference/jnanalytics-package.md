@@ -8,6 +8,16 @@ are built in Google BigQuery from Crossref and OpenAlex, using journal
 lists from the cOAlition S Journal Checker Tool and the ESAC registry.
 Successor of the 'hoaddata' package.
 
+## See also
+
+Useful links:
+
+- <https://github.com/njahn82/jn_analytics>
+
+- <https://njahn82.github.io/jn_analytics/>
+
+- Report bugs at <https://github.com/njahn82/jn_analytics/issues>
+
 ## Author
 
 **Maintainer**: Najko Jahn <najko.jahn@sub.uni-goettingen.de>

@@ -54,7 +54,10 @@ Parquet metadata.
   OpenAlex (`is_oa` or DOAJ) or the curated list. The aggregates carry
   an `oa_model` per year: a journal counts as hybrid up to and including
   its OpenAlex `oa_flip_year`, a transition year, and as fully OA
-  afterwards.
+  afterwards. Publishers that turned all their journals fully OA at once
+  are listed in `data-raw/manual/oa_flips.csv` (for example ACM from
+  2026); their hybrid journals count as hybrid up to the year before and
+  fully OA from then on.
 - **Countries.** First-author countries from OpenAlex, with full
   counting: a work with first-author affiliations in two countries
   counts in both. Take journal totals from `journal_year`, never by
@@ -89,8 +92,8 @@ package, Parquet, BigQuery.
 | `issn_l` | string, key | Linking ISSN |
 | `title` | string | Journal title (OpenAlex, else the Journal Checker Tool) |
 | `publisher` | string | Normalised publisher name, e.g. `Wiley` |
-| `oa_model` | string | Current OA model: `hybrid` or `full_oa` (fully open access, according to OpenAlex or the curated list); `NA` = not in OpenAlex. The aggregates carry a year-aware `oa_model` that uses `oa_flip_year` |
-| `oa_flip_year` | integer | Year the journal became fully OA according to OpenAlex; `NA` if unknown or never. This and earlier years count as hybrid in the aggregates |
+| `oa_model` | string | Current OA model: `hybrid` or `full_oa` (fully open access, according to OpenAlex, the curated list or a publisher-wide flip in `data-raw/manual/oa_flips.csv`); `NA` = not in OpenAlex. The aggregates carry a year-aware `oa_model` that uses `oa_flip_year` |
+| `oa_flip_year` | integer | Year the journal became fully OA according to OpenAlex, or for a publisher-wide flip the year before it took effect; `NA` if unknown or never. This and earlier years count as hybrid in the aggregates |
 | `openalex_source_id` | string | OpenAlex source ID |
 
 ### journal_issns
