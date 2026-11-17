@@ -1,0 +1,78 @@
+# Data build, started by hand (Actions tab -> build -> Run workflow, or
+# `gh workflow run build.yaml`); releases are roughly quarterly. Before a
+# build, put the current JCT files (jct_jn_all.csv, gzipped to
+# jct_jn_all.csv.gz, plus jct_inst_all.csv and esac_df.csv from the jct_data
+# scraper) into data-raw/ and push. Runs the
+# targets pipeline (_targets.R), which only rebuilds what changed (raw files,
+# SQL, Crossref/OpenAlex snapshots, year).
+#
+# Needs the repository secret GCP_SA_KEY: a service-account key (JSON) with
+# - BigQuery Job User on the billing project (subugoe-collaborative)
+# - BigQuery Data Viewer on cr_instant and openalex_walden
+# - BigQuery Data Editor on jn_analytics
+name: build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgload
+            any::targets
+            any::bigrquery
+            any::arrow
+            any::jsonlite
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # The targets store remembers what was built, so unchanged steps are
+      # skipped. GitHub drops caches unused for 7 days, so this mainly helps
+      # reruns shortly after a build; a quarterly run usually starts fresh
+      - name: Restore pipeline state
+        uses: actions/cache@v4
+        with:
+          path: _targets
+          key: targets-${{ github.run_id }}
+          restore-keys: targets-
+
+      - name: Run pipeline
+        run: |
+          targets::tar_make()
+          print(targets::tar_progress_summary())
+        shell: Rscript {0}
+
+      - name: Commit updated reference data and Parquet export
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ data-raw/openalex_sources.csv data-raw/diagnostics/ parquet/
+          if git diff --cached --quiet; then
+            echo "No changes to the reference data or Parquet export."
+          else
+            git commit -m "Update data ($(date -u +%Y-%m-%d))"
+            git push
+          fi

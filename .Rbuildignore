@@ -1,0 +1,14 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+^draft_implementation\.md$
+^\.DS_Store$
+^\.github$
+^parquet$
+^_targets\.R$
+^_targets$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^CLAUDE\.md$
+^\.claude$

@@ -1,0 +1,97 @@
+# CLAUDE.md
+
+R package **jnanalytics** (repo folder `jn_analytics`): open data about the
+journal market in transformative agreements, hybrid and fully open access.
+Successor of hoaddata 0.3 (`~/Documents/hoad/hoaddata`, kept frozen); the
+dashboard is `~/Documents/hoad/hoaddash`. Design background:
+`draft_implementation.md` (partly superseded by the decisions below).
+
+## Commands
+
+```r
+devtools::load_all()                 # load the package
+devtools::document()                 # after any roxygen change (run twice if links warn)
+devtools::test()                     # tests; devtools::test(filter = "analysis")
+devtools::check(args = "--no-manual")
+source("data-raw/reference.R")       # rebuild the bundled reference tables
+targets::tar_make()                  # full pipeline: reference -> BigQuery -> Parquet
+pkgdown::build_site()                # website into docs/
+```
+
+## How the package is organised
+
+- `inst/schema/columns.csv` is the single source of truth for every table's
+  columns, types, keys and descriptions. It feeds `jn_validate()`, the Rd
+  `@format` sections, the BigQuery column descriptions and the Parquet
+  metadata. Edit it with a CSV writer (Python `csv` or R), never by string
+  replacement: a comma in an unquoted description breaks the file.
+- `inst/sql/*.sql` are BigQuery templates with `{{dataset}}`, `{{openalex}}`,
+  `{{crossref}}`, `{{year_min}}`, `{{year_max}}`, rendered by `jn_sql()`. Tests
+  check that each template returns the schema's columns in order.
+- `_targets.R` is the build pipeline; `R/build.R`, `R/publish.R` the build
+  functions; `R/analysis.R`, `R/source.R` the analysis layer (dplyr on
+  Parquet via arrow, or BigQuery via dbplyr).
+- `data-raw/`: the JCT files (`jct_jn_all.csv`, stored gzipped as
+  `jct_jn_all.csv.gz`, `jct_inst_all.csv`, `esac_df.csv`) are copied in
+  **by hand** from
+  `~/Documents/r-tools/jct_data/data` (github.com/njahn82/jct_data). Do not
+  add automatic fetching. `legacy/` holds hoaddata 0.3 inputs,
+  `manual/` curated lookups, `diagnostics/` generated reports.
+
+## BigQuery rules
+
+- Inputs: only `subugoe-collaborative.cr_instant` (Crossref) and
+  `subugoe-collaborative.openalex_walden` (OpenAlex). Output:
+  `subugoe-collaborative.jn_analytics`. Other datasets (e.g. `oa2020.b18_*`)
+  are examples at most; do not build on them.
+- Always dry-run first and tell the user the GB and cost; get their OK before
+  billed queries or table builds. Full rebuild is about 245 GB; `articles`
+  alone about 140 GB. Never query the Crossref `reference` array (about
+  480 GB); use `reference_count`.
+- Auth: `jn_bq_auth()` (service-account key in CI, cached login locally).
+
+## Decisions already made (do not re-open without the user)
+
+- JCT is the only journal and agreement source; OAM was removed.
+- OpenAlex is the spine (works, types, journal, ISSN-L, OA status);
+  Crossref is joined by DOI only (no date filter) for CC licence and metadata
+  indicators. Years come from OpenAlex; `pub_year_crossref` is for comparison.
+- All works with a DOI from 2016 on are kept; filter on `work_type`
+  (research = `article`, `review`). No supplement or paratext filters in SQL.
+- CC licence counts for the version of record whatever `delay_in_days` (the
+  delay filter was too strict and lost ~120k fully OA works in 2025 alone);
+  only accepted-manuscript licences are excluded, plus hoaddata's
+  delayed-OA exception for four journals.
+- OA: every work in a fully OA journal-year is OA (share 100%); in a hybrid
+  journal-year, OA = CC licence in Crossref. `articles_oa` counts both;
+  `articles_with_cc_license` is the Crossref licence evidence alone (a
+  metadata indicator in fully OA journals).
+- Country-agnostic: no `scope`; country tables use full counting.
+- `oa_model` per year: hybrid up to and including the OpenAlex
+  `oa_flip_year`, fully OA afterwards.
+- Agreement coverage: first author; `direct`, `child` and `parent` ROR
+  matches count, `related` is stored but not counted; the period is checked
+  with the OpenAlex publication date only.
+- `portfolios` is one row per page and agreement (`agreement_id` = ESAC ID);
+  a page's journals come from `agreement_journals`. The ESAC IDs per page
+  are essential to the user.
+- Statistics per ESAC ID are journal-level (all works in the agreement's
+  journals, during the agreement period by default): `jn_oa(by =
+  "agreement_id")`, `agreement =` filter. Author-matched coverage is the
+  separate `agreement_journal_year` table.
+- Analysis functions default to all journals (`oa_model = NULL`).
+- The Parquet export (`parquet/`) is committed to the repo, by the `build`
+  workflow after each build, so each release is shared and versioned in git.
+- The `build` workflow is started by hand (roughly quarterly); no cron.
+
+## Conventions
+
+- Function prefix `jn_`; internal helpers have no roxygen docs.
+- Base pipe `|>`; `cli::cli_abort()` with `call =` pointing to the
+  user-facing function.
+- Tests mirror `R/` files; errors are tested with
+  `expect_snapshot(error = TRUE)`; prefer specific expectations over
+  `expect_true()`.
+- Every user-facing change gets a `NEWS.md` bullet; new exported topics go
+  into `_pkgdown.yml`.
+- Keep references to "hoaddata 0.3" where they describe data provenance.

@@ -1,0 +1,126 @@
+table,column,type,key,references,description
+journals,issn_l,string,TRUE,,Linking ISSN
+journals,title,string,FALSE,,"Journal title (OpenAlex, else the Journal Checker Tool)"
+journals,publisher,string,FALSE,,"Normalised publisher name, e.g. `Wiley`"
+journals,oa_model,string,FALSE,,"Current OA model: `hybrid` or `full_oa` (fully open access, according to OpenAlex or the curated list); `NA` = not in OpenAlex. The aggregates carry a year-aware `oa_model` that uses `oa_flip_year`"
+journals,oa_flip_year,integer,FALSE,,Year the journal became fully OA according to OpenAlex; `NA` if unknown or never. This and earlier years count as hybrid in the aggregates
+journals,openalex_source_id,string,FALSE,,OpenAlex source ID
+journal_issns,issn,string,TRUE,,Any ISSN of the journal
+journal_issns,issn_l,string,FALSE,journals.issn_l,Linking ISSN it belongs to
+agreements,agreement_id,string,TRUE,,ESAC ID as used in the Journal Checker Tool
+agreements,agreement_name,string,FALSE,,"`publisher (lead_institution)`, e.g. `Wiley (DEAL)`"
+agreements,publisher,string,FALSE,,Same names as in `journals`
+agreements,country,string,FALSE,,"ISO-2 country of the consortium, if national"
+agreements,lead_institution,string,FALSE,,"Consortium lead, e.g. `MPDL`"
+agreements,start_date,date,FALSE,,"Start of the agreement according to ESAC, or inferred (see `is_period_inferred`)"
+agreements,end_date,date,FALSE,,"End of the agreement according to ESAC, or inferred (see `is_period_inferred`)"
+agreements,is_period_inferred,boolean,FALSE,,`TRUE` if the agreement is missing from ESAC and its period is inferred: from 1 January of the year in its ID to the end of the year it was last listed in the Journal Checker Tool
+agreement_journals,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
+agreement_journals,issn_l,string,TRUE,journals.issn_l,→ `journals`
+agreement_journals,last_seen,date,FALSE,,Date the journal was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3)
+agreement_institutions,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
+agreement_institutions,ror,string,TRUE,,"ROR ID of a participating institution as listed in the Journal Checker Tool, full URL"
+agreement_institutions,inst_name,string,FALSE,,Institution name as listed in the Journal Checker Tool
+agreement_institutions,last_seen,date,FALSE,,Date the institution was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3)
+portfolios,portfolio_id,string,TRUE,,"Page slug, e.g. `wiley`"
+portfolios,portfolio_label,string,FALSE,,"Page title, e.g. `Wiley`"
+portfolios,agreement_id,string,TRUE,agreements.agreement_id,ESAC ID of an agreement on this page (→ `agreements`). The page's journals are those of its agreements in `agreement_journals`
+articles,doi,string,TRUE,,"DOI, lowercase"
+articles,openalex_id,string,FALSE,,OpenAlex work ID
+articles,issn_l,string,FALSE,journals.issn_l,→ `journals`
+articles,pub_year,integer,FALSE,,"Publication year (OpenAlex `publication_year`), used for all counts"
+articles,pub_year_crossref,integer,FALSE,,"Year of Crossref `issued`, for comparison only; can differ from `pub_year`. `NA` if not in Crossref"
+articles,work_type,string,FALSE,,"OpenAlex work type, e.g. `article`, `review`, `editorial`, `letter`"
+articles,is_in_crossref,boolean,FALSE,,"DOI has a Crossref record; if `FALSE`, all Crossref-based columns are `FALSE` or `0`"
+articles,cc_license,string,FALSE,,"Normalised CC licence for the version of record from Crossref (most permissive if several); `NA` = no CC licence. CC BY-NC-SA in the delayed-OA journals 0021-9525, 0022-1007, 0022-1295 and 0270-6474 does not count"
+articles,is_oa_crossref,boolean,FALSE,,"CC licence for the version of record in Crossref, whatever its start date (`delay_in_days` is not used), as in hoaddata 0.3"
+articles,oa_status,string,FALSE,,"OpenAlex OA status: `diamond`, `gold`, `hybrid`, `bronze`, `green` or `closed`"
+articles,has_tdm_link,boolean,FALSE,,Full-text (TDM) link in Crossref
+articles,has_orcid,boolean,FALSE,,At least one author with ORCID in Crossref
+articles,has_affiliation,boolean,FALSE,,At least one author affiliation in Crossref
+articles,has_affiliation_ror,boolean,FALSE,,At least one author affiliation with a ROR ID in Crossref
+articles,has_funder,boolean,FALSE,,Funding metadata in Crossref
+articles,has_funder_id,boolean,FALSE,,At least one funder with a Funder Registry DOI in Crossref
+articles,has_abstract,boolean,FALSE,,Open abstract in Crossref
+articles,has_references,boolean,FALSE,,Open reference list in Crossref
+articles,n_authors,integer,FALSE,,Authors in Crossref
+articles,n_authors_with_orcid,integer,FALSE,,Authors with ORCID in Crossref
+articles,n_affiliations,integer,FALSE,,"Author affiliations in Crossref, counted per author"
+articles,n_affiliations_with_ror,integer,FALSE,,"Author affiliations with a ROR ID in Crossref, counted per author"
+articles,n_funders,integer,FALSE,,Funders in Crossref
+articles,n_funders_with_id,integer,FALSE,,Funders with a Funder Registry DOI in Crossref
+article_first_authors,doi,string,TRUE,articles.doi,→ `articles`
+article_first_authors,ror,string,TRUE,,"ROR ID of the institution, full URL; `NA` if OpenAlex found the country but no institution"
+article_first_authors,country_code,string,TRUE,,"ISO-2, uppercase"
+article_first_authors,country_source,string,FALSE,,`institution` (country of a matched OpenAlex institution) or `affiliation` (country OpenAlex derived from the affiliation string only)
+article_agreements,doi,string,TRUE,articles.doi,→ `articles`
+article_agreements,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`. The journal is covered by the agreement and the work's OpenAlex publication date lies within the agreement period (Crossref `issued` is not used)
+article_agreements,author_role,string,TRUE,,`corresponding` or `first`: the author whose institution matched. A first author who is also corresponding author gives one row per role
+article_agreements,ror_author,string,TRUE,,"ROR ID of the author's institution (OpenAlex), full URL"
+article_agreements,ror_agreement,string,TRUE,agreement_institutions.ror,ROR ID of the participating institution it matched
+article_agreements,match_type,string,FALSE,,"How the author's institution relates to the participating one, per OpenAlex: `direct` (same), `child` (part of it, any depth), `parent` (the author's institution contains it) or `related`. `direct`, `child` and `parent` count in `agreement_journal_year`; `related` is kept for comparison with hoaddata 0.3, which counted it too"
+journal_year,issn_l,string,TRUE,journals.issn_l,→ `journals`
+journal_year,pub_year,integer,TRUE,,Publication year
+journal_year,oa_model,string,FALSE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
+journal_year,work_type,string,TRUE,,"OpenAlex work type, as in `articles`. Sum over all types for all works; filter to `article` and `review` for research articles"
+journal_year,articles,integer,FALSE,,All works of this type
+journal_year,articles_in_crossref,integer,FALSE,,With a Crossref record; denominator for the Crossref-based columns
+journal_year,articles_oa,integer,FALSE,,"OA: all works in a fully OA journal-year (`oa_model` `full_oa`); in a hybrid journal-year, works with a CC licence in Crossref (`is_oa_crossref`)"
+journal_year,articles_oa_openalex,integer,FALSE,,"OA at the publisher according to OpenAlex (`oa_status` `diamond`, `gold` or `hybrid`)"
+journal_year,articles_with_cc_license,integer,FALSE,,"With a CC licence for the version of record in Crossref (`is_oa_crossref`). In fully OA journals a metadata indicator, not OA evidence"
+journal_year,articles_with_tdm_link,integer,FALSE,,With full-text links
+journal_year,articles_with_orcid,integer,FALSE,,With at least one ORCID
+journal_year,articles_with_affiliation,integer,FALSE,,With at least one author affiliation
+journal_year,articles_with_affiliation_ror,integer,FALSE,,With at least one ROR ID for an author affiliation
+journal_year,articles_with_funder,integer,FALSE,,With funding metadata
+journal_year,articles_with_funder_id,integer,FALSE,,With at least one Funder Registry DOI
+journal_year,articles_with_abstract,integer,FALSE,,With open abstract
+journal_year,articles_with_references,integer,FALSE,,With open reference list
+journal_year_country,issn_l,string,TRUE,journals.issn_l,→ `journals`
+journal_year_country,pub_year,integer,TRUE,,Publication year
+journal_year_country,oa_model,string,FALSE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
+journal_year_country,work_type,string,TRUE,,"OpenAlex work type, as in `articles`. Sum over all types for all works; filter to `article` and `review` for research articles"
+journal_year_country,country_code,string,TRUE,,"First author's country. Full counting: a work with first-author affiliations in two countries counts in both, so summing over countries overstates totals; take journal totals from `journal_year`"
+journal_year_country,articles,integer,FALSE,,All works of this type
+journal_year_country,articles_in_crossref,integer,FALSE,,With a Crossref record; denominator for the Crossref-based columns
+journal_year_country,articles_oa,integer,FALSE,,"OA: all works in a fully OA journal-year (`oa_model` `full_oa`); in a hybrid journal-year, works with a CC licence in Crossref (`is_oa_crossref`)"
+journal_year_country,articles_oa_openalex,integer,FALSE,,"OA at the publisher according to OpenAlex (`oa_status` `diamond`, `gold` or `hybrid`)"
+journal_year_country,articles_with_cc_license,integer,FALSE,,"With a CC licence for the version of record in Crossref (`is_oa_crossref`). In fully OA journals a metadata indicator, not OA evidence"
+journal_year_country,articles_with_tdm_link,integer,FALSE,,With full-text links
+journal_year_country,articles_with_orcid,integer,FALSE,,With at least one ORCID
+journal_year_country,articles_with_affiliation,integer,FALSE,,With at least one author affiliation
+journal_year_country,articles_with_affiliation_ror,integer,FALSE,,With at least one ROR ID for an author affiliation
+journal_year_country,articles_with_funder,integer,FALSE,,With funding metadata
+journal_year_country,articles_with_funder_id,integer,FALSE,,With at least one Funder Registry DOI
+journal_year_country,articles_with_abstract,integer,FALSE,,With open abstract
+journal_year_country,articles_with_references,integer,FALSE,,With open reference list
+journal_year_country_license,issn_l,string,TRUE,journals.issn_l,→ `journals`
+journal_year_country_license,pub_year,integer,TRUE,,Publication year
+journal_year_country_license,oa_model,string,FALSE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
+journal_year_country_license,work_type,string,TRUE,,"OpenAlex work type, as in `articles`. Sum over all types for all works; filter to `article` and `review` for research articles"
+journal_year_country_license,country_code,string,TRUE,,"First author's country. Full counting: a work with first-author affiliations in two countries counts in both, so summing over countries overstates totals; take journal totals from `journal_year`"
+journal_year_country_license,cc_license,string,TRUE,,CC licence in Crossref; `NA` = none (in a fully OA journal the work is still OA)
+journal_year_country_license,articles,integer,FALSE,,Articles in this group
+agreement_journal_year,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
+agreement_journal_year,issn_l,string,TRUE,journals.issn_l,→ `journals`
+agreement_journal_year,pub_year,integer,TRUE,,Publication year
+agreement_journal_year,oa_model,string,FALSE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
+agreement_journal_year,work_type,string,TRUE,,"OpenAlex work type, as in `articles`"
+agreement_journal_year,author_role,string,TRUE,,"`first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage (as in hoaddata 0.3 and the dashboard); `corresponding` is kept for comparison. Roles overlap: never sum over them"
+agreement_journal_year,articles,integer,FALSE,,"Works covered by the agreement through a `direct`, `child` or `parent` match for this author role. A work under several agreements counts in each"
+agreement_journal_year,articles_oa,integer,FALSE,,"Of these, OA: all in a fully OA journal-year; in a hybrid journal-year, those with a CC licence in Crossref"
+agreement_journal_year,articles_oa_openalex,integer,FALSE,,"Of these, OA at the publisher according to OpenAlex"
+agreement_journal_year,articles_with_cc_license,integer,FALSE,,"Of these, with a CC licence in Crossref"
+journal_year_license,issn_l,string,TRUE,journals.issn_l,→ `journals`
+journal_year_license,pub_year,integer,TRUE,,Publication year
+journal_year_license,oa_model,string,FALSE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
+journal_year_license,work_type,string,TRUE,,"OpenAlex work type, as in `articles`. Sum over all types for all works; filter to `article` and `review` for research articles"
+journal_year_license,cc_license,string,TRUE,,CC licence in Crossref; `NA` = none (in a fully OA journal the work is still OA)
+journal_year_license,articles,integer,FALSE,,Articles in this group
+release,version,string,TRUE,,Release version
+release,snapshot_date,date,FALSE,,Date the release was built
+release,crossref_snapshot,string,FALSE,,Crossref snapshot used
+release,openalex_snapshot,string,FALSE,,OpenAlex snapshot used
+release,jct_snapshot,string,FALSE,,Journal Checker Tool data used (last commit date)
+release,pub_year_min,integer,FALSE,,First publication year covered
+release,pub_year_max,integer,FALSE,,Last publication year covered
