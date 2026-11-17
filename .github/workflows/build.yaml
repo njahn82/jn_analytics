@@ -10,10 +10,20 @@
 # - BigQuery Job User on the billing project (subugoe-collaborative)
 # - BigQuery Data Viewer on cr_instant and openalex_walden
 # - BigQuery Data Editor on jn_analytics
+# The service account jn-analytics-build@subugoe-collaborative has these.
+#
+# Run with "check only" to test the login and permissions without a build:
+# it reads the snapshot dates, dry-runs the articles query and writes and
+# deletes a one-row test table in jn_analytics. Nothing is billed.
 name: build
 
 on:
   workflow_dispatch:
+    inputs:
+      check_only:
+        description: "Check only: test login and permissions, no build"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,10 +59,25 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Check login and permissions
+        if: inputs.check_only
+        run: |
+          pkgload::load_all(quiet = TRUE)
+          jn_bq_auth()
+          cat("Snapshots:\n"); print(jn_snapshots())
+          jn_build_table("articles", dry_run = TRUE)
+          config <- jn_bq_config()
+          tbl <- bigrquery::bq_table(config$project, config$dataset, "_auth_check")
+          bigrquery::bq_table_upload(tbl, data.frame(ok = TRUE), write_disposition = "WRITE_TRUNCATE")
+          bigrquery::bq_table_delete(tbl)
+          cat("Wrote and deleted a test table in", config$dataset, "\n")
+        shell: Rscript {0}
+
       # The targets store remembers what was built, so unchanged steps are
       # skipped. GitHub drops caches unused for 7 days, so this mainly helps
       # reruns shortly after a build; a quarterly run usually starts fresh
       - name: Restore pipeline state
+        if: ${{ !inputs.check_only }}
         uses: actions/cache@v4
         with:
           path: _targets
@@ -60,12 +85,14 @@ jobs:
           restore-keys: targets-
 
       - name: Run pipeline
+        if: ${{ !inputs.check_only }}
         run: |
           targets::tar_make()
           print(targets::tar_progress_summary())
         shell: Rscript {0}
 
       - name: Commit updated reference data and Parquet export
+        if: ${{ !inputs.check_only }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
