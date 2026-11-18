@@ -20,6 +20,7 @@ source("data-raw/reference.R")
 | `manual/oa_flips.csv` | Publishers that turned all their journals fully OA, with the first fully OA year (`full_oa_from`) and a source. Their hybrid and unclassified journals become `full_oa` with `oa_flip_year = full_oa_from - 1` | curated |
 | `manual/publisher_names.csv` | Publisher name variants → normalised name | curated |
 | `manual/agreement_publishers.csv` | Publisher for ESAC ID prefixes missing from `esac_df.csv` | curated |
+| `manual/institution_corrections.csv` | Participating institutions to `add` to or `remove` from an agreement where the JCT list is wrong, with ROR ID, name and source (`reason`). The build stops if a correction no longer applies | curated |
 | `manual/portfolios.csv` | Dashboard publisher pages (replaces the JCT part of hoaddash `config.csv`) | curated |
 | `diagnostics/unmatched_jct.csv` | Output: JCT rows that could not be matched to an ISSN-L | generated |
 | `diagnostics/institutions_without_ror.csv` | Output: JCT institutions without a valid ROR ID, not matchable | generated |

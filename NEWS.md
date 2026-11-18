@@ -35,6 +35,12 @@ unchanged for code that relies on its tables.
   `article_agreements` have a new `pub_year` column.
 * `jn_source()` reads tables stored as a folder of files, so the article
   tables can be analysed from a download as well as from BigQuery.
+* Curated corrections of the JCT institution lists in
+  `data-raw/manual/institution_corrections.csv` add or remove participating
+  institutions per agreement, with their source. The first fixes
+  `ieee2025cas` (IEEE and DRAA) against IEEE's partner list: six universities
+  added, among them South China University of Technology, and fourteen
+  removed. A correction that no longer applies stops the build.
 * `normalize_ror()` brings ROR IDs into one canonical form.
 * A CC licence counts for the version of record whatever its start date in
   Crossref (`delay_in_days` is ignored), as in hoaddata 0.3.

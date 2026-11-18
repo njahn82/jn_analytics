@@ -19,7 +19,11 @@
 #'   know fall back to the legacy file.
 #' - `legacy/journal_titles.csv`: fallback journal titles.
 #' - `manual/*.csv`: curated lookups (publisher names, OA models, publishers
-#'   that flipped their journals to open access, exclusions, portfolios).
+#'   that flipped their journals to open access, exclusions, portfolios) and
+#'   corrections of the JCT institution lists
+#'   (`manual/institution_corrections.csv`: participating institutions to add
+#'   to or remove from an agreement, with the source). A correction that no
+#'   longer applies, because the JCT has changed, stops the build.
 #'
 #' @param raw_dir Directory with the raw files.
 #' @param quiet If `FALSE`, report coverage diagnostics.
@@ -47,7 +51,8 @@ jn_update_reference <- function(raw_dir = "data-raw", quiet = FALSE) {
   ai <- build_agreement_institutions(
     jct_inst = inputs$jct_inst,
     legacy_inst = inputs$legacy_inst,
-    agreement_ids = agreements$agreement_id
+    agreement_ids = agreements$agreement_id,
+    corrections = inputs$institution_corrections
   )
   journals <- build_journals(
     agreement_journals = aj$table,
@@ -176,6 +181,7 @@ read_reference_inputs <- function(raw_dir) {
     publisher_names = read("manual/publisher_names.csv", col_types = chr),
     agreement_publishers = read("manual/agreement_publishers.csv", col_types = chr),
     portfolios = read("manual/portfolios.csv", col_types = chr),
+    institution_corrections = read("manual/institution_corrections.csv", col_types = chr),
     jct_inst = read("jct_inst_all.csv", col_types = readr::cols(
       time_last_seen = readr::col_datetime(),
       .default = readr::col_character()
@@ -339,9 +345,12 @@ build_agreements <- function(agreement_ids, esac, agreement_publishers,
 }
 
 # Participating institutions per agreement, from the current JCT export and
-# hoaddata 0.3 (kept, as for journals). Rows without a valid ROR ID cannot be
-# matched to OpenAlex and are reported separately.
-build_agreement_institutions <- function(jct_inst, legacy_inst, agreement_ids) {
+# hoaddata 0.3 (kept, as for journals), with curated corrections applied. Rows
+# without a valid ROR ID cannot be matched to OpenAlex and are reported
+# separately.
+build_agreement_institutions <- function(jct_inst, legacy_inst, agreement_ids,
+                                         corrections = NULL,
+                                         call = rlang::caller_env()) {
   rows <- dplyr::bind_rows(
     jct_inst |>
       dplyr::transmute(
@@ -378,10 +387,57 @@ build_agreement_institutions <- function(jct_inst, legacy_inst, agreement_ids) {
       .groups = "drop"
     ) |>
     dplyr::left_join(names[c("agreement_id", "ror", "inst_name")], by = c("agreement_id", "ror")) |>
-    dplyr::select(dplyr::all_of(jn_schema("agreement_institutions")$column)) |>
-    dplyr::arrange(.data$agreement_id, .data$ror)
+    dplyr::select(dplyr::all_of(jn_schema("agreement_institutions")$column))
+  if (!is.null(corrections)) {
+    table <- apply_institution_corrections(table, corrections, agreement_ids, call = call)
+  }
+  table <- dplyr::arrange(table, .data$agreement_id, .data$ror)
 
   list(table = table, no_ror = no_ror)
+}
+
+# Add or remove participating institutions listed in
+# manual/institution_corrections.csv. Every correction must still apply, so
+# that corrections made obsolete by a JCT update are noticed
+apply_institution_corrections <- function(table, corrections, agreement_ids,
+                                          call = rlang::caller_env()) {
+  corrections <- dplyr::mutate(corrections, ror = normalize_ror(.data$ror))
+  key <- paste(corrections$agreement_id, corrections$ror)
+  listed <- key %in% paste(table$agreement_id, table$ror)
+  problems <- c(
+    sprintf("Unknown action %s for %s.", corrections$action, key)[
+      !corrections$action %in% c("add", "remove")
+    ],
+    sprintf("Invalid ROR ID for %s %s.", corrections$agreement_id, corrections$inst_name)[
+      is.na(corrections$ror)
+    ],
+    sprintf("Unknown agreement %s.", corrections$agreement_id)[
+      !corrections$agreement_id %in% agreement_ids
+    ],
+    sprintf("%s (%s) is listed already; remove the `add` row.", key, corrections$inst_name)[
+      corrections$action == "add" & listed
+    ],
+    sprintf("%s (%s) is not listed; remove the `remove` row.", key, corrections$inst_name)[
+      corrections$action == "remove" & !listed
+    ],
+    sprintf("%s is corrected more than once.", key)[duplicated(key)]
+  )
+  if (length(problems) > 0) {
+    cli::cli_abort(
+      c(
+        "{.file manual/institution_corrections.csv} does not fit the JCT institution lists.",
+        rlang::set_names(sprintf("{problems[%d]}", seq_along(problems)), rep("x", length(problems)))
+      ),
+      call = call
+    )
+  }
+
+  removed <- corrections[corrections$action == "remove", c("agreement_id", "ror")]
+  added <- corrections[corrections$action == "add", ] |>
+    dplyr::transmute(.data$agreement_id, .data$ror, .data$inst_name, last_seen = as.Date(NA))
+  table |>
+    dplyr::anti_join(removed, by = c("agreement_id", "ror")) |>
+    dplyr::bind_rows(added)
 }
 
 # `publisher` is the most frequent publisher among the agreements covering the

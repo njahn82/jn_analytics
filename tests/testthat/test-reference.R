@@ -129,6 +129,49 @@ test_that("build_agreement_institutions() merges sources and drops invalid RORs"
   expect_equal(out$no_ror$inst_name, "No ROR")
 })
 
+test_that("build_agreement_institutions() adds and removes curated institutions", {
+  jct <- tibble::tibble(
+    esac_id = "a1", inst_name = c("TU Delft", "Not a partner"),
+    ror_id = c("https://ror.org/02e2c7k09", "https://ror.org/05gxyna29"),
+    time_last_seen = as.POSIXct("2025-01-01", tz = "UTC")
+  )
+  legacy <- tibble::tibble(esac_id = "gone", inst_name = "Old", ror_id = "https://ror.org/05gxyna29")
+  corrections <- tibble::tibble(
+    agreement_id = "a1", action = c("add", "remove"),
+    ror = c("ror.org/04qr3zq92", "https://ror.org/05gxyna29"),
+    inst_name = c("UESTC", "Not a partner"), reason = "partner list"
+  )
+  out <- build_agreement_institutions(jct, legacy, "a1", corrections)
+
+  expect_equal(out$table$ror, c("https://ror.org/02e2c7k09", "https://ror.org/04qr3zq92"))
+  expect_equal(out$table$inst_name, c("TU Delft", "UESTC"))
+  expect_equal(out$table$last_seen, as.Date(c("2025-01-01", NA)))
+})
+
+test_that("institution corrections that no longer apply stop the build", {
+  table <- tibble::tibble(
+    agreement_id = "a1", ror = "https://ror.org/02e2c7k09",
+    inst_name = "TU Delft", last_seen = as.Date("2025-01-01")
+  )
+  corrections <- tibble::tibble(
+    agreement_id = c("a1", "a1", "gone", "a1"),
+    action = c("add", "remove", "add", "drop"),
+    ror = c("https://ror.org/02e2c7k09", "https://ror.org/05gxyna29", "https://ror.org/04qr3zq92", "https://ror.org/00g2ypp58"),
+    inst_name = c("TU Delft", "Not listed", "UESTC", "Other"), reason = "test"
+  )
+  expect_snapshot(apply_institution_corrections(table, corrections, "a1"), error = TRUE)
+})
+
+test_that("the curated institution corrections fit the bundled data", {
+  path <- test_path("..", "..", "data-raw", "manual", "institution_corrections.csv")
+  skip_if_not(file.exists(path), "data-raw not available")
+  corrections <- readr::read_csv(path, col_types = readr::cols(.default = "c"))
+  key <- paste(agreement_institutions$agreement_id, agreement_institutions$ror)
+  wanted <- paste(corrections$agreement_id, corrections$ror)
+  expect_in(wanted[corrections$action == "add"], key)
+  expect_disjoint(wanted[corrections$action == "remove"], key)
+})
+
 test_that("jn_save_reference() writes one .rda per reference table", {
   dir <- withr::local_tempdir()
   ref <- list(

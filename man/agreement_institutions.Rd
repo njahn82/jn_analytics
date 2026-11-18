@@ -8,9 +8,9 @@
 A tibble with 4 columns:
 \itemize{
 \item \code{agreement_id} (string, key): → \code{agreements}
-\item \code{ror} (string, key): ROR ID of a participating institution as listed in the Journal Checker Tool, full URL
-\item \code{inst_name} (string): Institution name as listed in the Journal Checker Tool
-\item \code{last_seen} (date): Date the institution was last listed for this agreement in the Journal Checker Tool; \code{NA} if only listed in archived JCT data (hoaddata 0.3)
+\item \code{ror} (string, key): ROR ID of a participating institution as listed in the Journal Checker Tool or added by a curated correction (\code{data-raw/manual/institution_corrections.csv}), full URL
+\item \code{inst_name} (string): Institution name as listed in the Journal Checker Tool or in the curated correction
+\item \code{last_seen} (date): Date the institution was last listed for this agreement in the Journal Checker Tool; \code{NA} if only listed in archived JCT data (hoaddata 0.3) or added by a curated correction
 }
 }
 \source{

@@ -19,9 +19,9 @@ agreement_journals,agreement_id,string,TRUE,agreements.agreement_id,→ `agreeme
 agreement_journals,issn_l,string,TRUE,journals.issn_l,→ `journals`
 agreement_journals,last_seen,date,FALSE,,Date the journal was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3)
 agreement_institutions,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
-agreement_institutions,ror,string,TRUE,,"ROR ID of a participating institution as listed in the Journal Checker Tool, full URL"
-agreement_institutions,inst_name,string,FALSE,,Institution name as listed in the Journal Checker Tool
-agreement_institutions,last_seen,date,FALSE,,Date the institution was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3)
+agreement_institutions,ror,string,TRUE,,"ROR ID of a participating institution as listed in the Journal Checker Tool or added by a curated correction (`data-raw/manual/institution_corrections.csv`), full URL"
+agreement_institutions,inst_name,string,FALSE,,Institution name as listed in the Journal Checker Tool or in the curated correction
+agreement_institutions,last_seen,date,FALSE,,Date the institution was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3) or added by a curated correction
 portfolios,portfolio_id,string,TRUE,,"Page slug, e.g. `wiley`"
 portfolios,portfolio_label,string,FALSE,,"Page title, e.g. `Wiley`"
 portfolios,agreement_id,string,TRUE,agreements.agreement_id,ESAC ID of an agreement on this page (→ `agreements`). The page's journals are those of its agreements in `agreement_journals`
