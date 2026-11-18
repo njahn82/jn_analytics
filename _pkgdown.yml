@@ -55,7 +55,7 @@ reference:
 
   - title: Analysis
     desc: >
-      The same functions run on the Parquet export and on BigQuery.
+      The same functions run on the Parquet files and on BigQuery.
     contents:
       - jn_oa
       - jn_source
@@ -72,7 +72,8 @@ reference:
   - title: Building the data
     desc: >
       Reference tables from the raw JCT and ESAC files, BigQuery tables from
-      the SQL templates in `inst/sql`, and the Parquet export. Usually run
+      the SQL templates in `inst/sql`, the Parquet export and its upload to
+      Hugging Face. Usually run
       through the targets pipeline in `_targets.R`.
     contents:
       - jn_update_reference
@@ -84,6 +85,7 @@ reference:
       - jn_publish
       - jn_publish_tables
       - jn_release
+      - jn_upload_hf
 
   - title: BigQuery
     contents:

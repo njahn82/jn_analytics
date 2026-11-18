@@ -8,26 +8,39 @@ jn_publish(
   path,
   tables = jn_publish_tables(),
   raw_dir = "data-raw",
-  config = jn_bq_config()
+  config = jn_bq_config(),
+  max_gb = 30
 )
 }
 \arguments{
-\item{path}{Directory to write to, e.g. the dashboard's \verb{docs/data/}.}
+\item{path}{Directory to write to.}
 
-\item{tables}{Tables to export.}
+\item{tables}{Tables to export, see \code{\link[=jn_publish_tables]{jn_publish_tables()}}.}
 
 \item{raw_dir, config}{See \code{\link[=jn_release]{jn_release()}}.}
+
+\item{max_gb}{Stop before exporting an article table whose queries would
+scan more than this.}
 }
 \value{
 The written file paths, invisibly.
 }
 \description{
-Downloads the reference tables and the journal-level aggregates from
-BigQuery, validates them against \code{\link[=jn_schema]{jn_schema()}} and writes one
-zstd-compressed Parquet file per table to \code{path}, plus a \code{release} table
-that is also uploaded to BigQuery. Article-level tables stay in BigQuery.
+Downloads tables from BigQuery, validates them against \code{\link[=jn_schema]{jn_schema()}} and
+writes zstd-compressed Parquet files to \code{path}, in the layout of the
+Hugging Face dataset (see \code{\link[=jn_upload_hf]{jn_upload_hf()}}):
 }
 \details{
+\itemize{
+\item one file per table for the reference tables and the journal-level
+aggregates, e.g. \code{journal_year.parquet}, plus a \code{release} table (written
+with \code{journal_year} and also uploaded to BigQuery);
+\item one folder per article table with one file per publication year, e.g.
+\code{articles/articles_2025.parquet}. These are read year by year from the
+tables partitioned by \code{pub_year} (see \code{\link[=jn_build_table]{jn_build_table()}}), so each query
+scans only that year. Old files in the folder are removed first.
+}
+
 Each file carries its table name, the package version and the column
 descriptions as Parquet key-value metadata (\code{jn_table}, \code{jn_version},
 \code{jn_columns} as JSON), readable for example with DuckDB's

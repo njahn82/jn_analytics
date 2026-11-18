@@ -31,5 +31,5 @@
     Condition
       Error in `jn_tbl()`:
       ! Table "articles" is not in this source.
-      i Article-level tables are only in BigQuery: use `jn_source("bigquery")`.
+      i Available: "journals", "agreements", "agreement_journals", "portfolios", "journal_year", "journal_year_country", "journal_year_country_license", and "journal_year_license"
 

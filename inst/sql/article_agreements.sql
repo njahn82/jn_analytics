@@ -56,6 +56,7 @@ periods AS (
 authors AS (
   SELECT
     a.doi,
+    a.pub_year,
     a.issn_l,
     SAFE_CAST(w.publication_date AS DATE) AS pub_date,
     author_role,
@@ -77,6 +78,7 @@ authors AS (
 
 SELECT
   au.doi,
+  au.pub_year,
   aj.agreement_id,
   au.author_role,
   au.ror_author,

@@ -14,7 +14,7 @@ devtools::document()                 # after any roxygen change (run twice if li
 devtools::test()                     # tests; devtools::test(filter = "analysis")
 devtools::check(args = "--no-manual")
 source("data-raw/reference.R")       # rebuild the bundled reference tables
-targets::tar_make()                  # full pipeline: reference -> BigQuery -> Parquet
+targets::tar_make()                  # full pipeline: reference -> BigQuery -> Parquet -> Hugging Face
 pkgdown::build_site()                # website into docs/
 ```
 
@@ -81,8 +81,16 @@ pkgdown::build_site()                # website into docs/
   "agreement_id")`, `agreement =` filter. Author-matched coverage is the
   separate `agreement_journal_year` table.
 - Analysis functions default to all journals (`oa_model = NULL`).
-- The Parquet export (`parquet/`) is committed to the repo, by the `build`
-  workflow after each build, so each release is shared and versioned in git.
+- All 15 tables are published as Parquet in the Hugging Face dataset
+  `najkoja/jn_analytics` (GitHub stays `njahn82/jn_analytics`), uploaded by
+  `jn_upload_hf()` in the pipeline with the `HF_TOKEN` secret. Each release
+  is a commit tagged with its build date (`release$snapshot_date`).
+  `parquet/` is the local export folder and is not in git (older exports
+  stay in the git history).
+- Article tables are partitioned by `pub_year` in BigQuery and exported as
+  one file per year (`articles/articles_2025.parquet`); `article_first_authors`
+  and `article_agreements` carry `pub_year` for this.
+- BigQuery access through bigrquery only (no bigrquerystorage).
 - The `build` workflow is started by hand (roughly quarterly); no cron.
 
 ## Conventions

@@ -197,3 +197,9 @@ rd_format <- function(table) {
     paste(items, collapse = "\n")
   )
 }
+
+# One-line description of each table's rows, from inst/schema/tables.csv
+table_grains <- function() {
+  path <- system.file("schema", "tables.csv", package = "jnanalytics", mustWork = TRUE)
+  tibble::as_tibble(utils::read.csv(path, stringsAsFactors = FALSE, encoding = "UTF-8"))
+}

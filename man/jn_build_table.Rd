@@ -30,5 +30,7 @@ The BigQuery table, invisibly (or the bytes, for a dry run).
 \description{
 Renders \verb{inst/sql/<name>.sql} with \code{\link[=jn_sql]{jn_sql()}}, reports the bytes the
 query will scan, writes the result to \verb{<project>.<dataset>.<name>}
-(replacing it) and sets the column descriptions from \code{\link[=jn_schema]{jn_schema()}}.
+(replacing it) and sets the column descriptions from \code{\link[=jn_schema]{jn_schema()}}. The
+article tables (\code{articles}, \code{article_first_authors}, \code{article_agreements})
+are partitioned by \code{pub_year}, so queries for single years scan less.
 }

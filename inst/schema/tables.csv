@@ -1,0 +1,16 @@
+table,grain
+journals,one row per journal in a transformative agreement
+journal_issns,one row per ISSN
+agreements,one row per transformative agreement
+agreement_journals,one row per agreement and journal
+agreement_institutions,one row per agreement and participating institution
+portfolios,one row per dashboard page and agreement (ESAC ID); journals via agreement_journals
+articles,one row per work with a DOI
+article_first_authors,"one row per work, first-author institution and country"
+article_agreements,"one row per work, agreement, author role and institution match"
+journal_year,"works per journal, year and work type"
+journal_year_country,"as journal_year, per first-author country"
+journal_year_license,"works per journal, year, work type and CC licence"
+journal_year_country_license,"works per journal, year, work type, first-author country and CC licence"
+agreement_journal_year,"works covered per agreement, journal, year, work type and author role"
+release,one row describing the release

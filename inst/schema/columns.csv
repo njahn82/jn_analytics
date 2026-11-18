@@ -50,10 +50,12 @@ articles,n_affiliations_with_ror,integer,FALSE,,"Author affiliations with a ROR 
 articles,n_funders,integer,FALSE,,Funders in Crossref
 articles,n_funders_with_id,integer,FALSE,,Funders with a Funder Registry DOI in Crossref
 article_first_authors,doi,string,TRUE,articles.doi,→ `articles`
+article_first_authors,pub_year,integer,FALSE,,"Publication year of the work, as `articles.pub_year`; the files are split by it"
 article_first_authors,ror,string,TRUE,,"ROR ID of the institution, full URL; `NA` if OpenAlex found the country but no institution"
 article_first_authors,country_code,string,TRUE,,"ISO-2, uppercase"
 article_first_authors,country_source,string,FALSE,,`institution` (country of a matched OpenAlex institution) or `affiliation` (country OpenAlex derived from the affiliation string only)
 article_agreements,doi,string,TRUE,articles.doi,→ `articles`
+article_agreements,pub_year,integer,FALSE,,"Publication year of the work, as `articles.pub_year`; the files are split by it"
 article_agreements,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`. The journal is covered by the agreement and the work's OpenAlex publication date lies within the agreement period (Crossref `issued` is not used)
 article_agreements,author_role,string,TRUE,,`corresponding` or `first`: the author whose institution matched. A first author who is also corresponding author gives one row per role
 article_agreements,ror_author,string,TRUE,,"ROR ID of the author's institution (OpenAlex), full URL"

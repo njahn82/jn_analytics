@@ -7,3 +7,4 @@ jnanalytics.Rcheck/
 _targets/
 docs/
 inst/doc
+parquet/

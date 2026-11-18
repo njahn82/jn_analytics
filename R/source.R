@@ -1,9 +1,10 @@
 #' Connect to the jnanalytics tables
 #'
-#' The analysis functions read from a source: the Parquet files written by
-#' [jn_publish()] (journal-level tables only), or the BigQuery dataset
-#' (all tables, including the article-level `articles` and
-#' `article_first_authors`).
+#' The analysis functions read from a source: a folder of Parquet files as
+#' written by [jn_publish()] or downloaded from Hugging Face, or the BigQuery
+#' dataset. A table is either one file (`journal_year.parquet`) or a folder
+#' of files (`articles/articles_2025.parquet`, ...); a download of only some
+#' tables or years works too.
 #'
 #' @param x A directory with Parquet files, or `"bigquery"`.
 #' @param config See [jn_bq_config()]. Used for BigQuery only.
@@ -13,10 +14,13 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' src <- jn_source("parquet")
+#' # hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
+#' src <- jn_source("jn_data")
 #' jn_tbl(src, "journal_year")
+#' jn_tbl(src, "articles") |>
+#'   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
+#'   dplyr::collect()
 #'
-#' # Article-level data is only in BigQuery
 #' bq <- jn_source("bigquery")
 #' jn_tbl(bq, "articles") |>
 #'   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
@@ -40,9 +44,9 @@ jn_source <- function(x = "parquet", config = jn_bq_config()) {
   if (!dir.exists(x)) {
     cli::cli_abort("Directory {.path {x}} not found. Run {.fn jn_publish} first.")
   }
-  files <- list.files(x, pattern = "\\.parquet$")
+  tables <- intersect(jn_tables(), unique(export_files(x)$table))
   structure(
-    list(type = "parquet", path = x, tables = sub("\\.parquet$", "", files)),
+    list(type = "parquet", path = x, tables = tables),
     class = "jn_source"
   )
 }
@@ -54,17 +58,16 @@ jn_source <- function(x = "parquet", config = jn_bq_config()) {
 jn_tbl <- function(src, table) {
   check_table_name(table)
   if (!table %in% src$tables) {
-    hint <- if (src$type == "parquet" && table %in% c("articles", "article_first_authors")) {
-      "Article-level tables are only in BigQuery: use {.code jn_source(\"bigquery\")}."
-    } else {
-      "Available: {.val {src$tables}}"
-    }
-    cli::cli_abort(c("Table {.val {table}} is not in this source.", "i" = hint))
+    cli::cli_abort(c(
+      "Table {.val {table}} is not in this source.",
+      "i" = "Available: {.val {src$tables}}"
+    ))
   }
-  switch(src$type,
-    parquet = arrow::open_dataset(file.path(src$path, paste0(table, ".parquet"))),
-    bigquery = dplyr::tbl(src$con, table)
-  )
+  if (src$type == "bigquery") {
+    return(dplyr::tbl(src$con, table))
+  }
+  file <- file.path(src$path, paste0(table, ".parquet"))
+  arrow::open_dataset(if (file.exists(file)) file else file.path(src$path, table))
 }
 
 #' @export

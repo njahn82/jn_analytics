@@ -21,9 +21,20 @@ unchanged for code that relies on its tables.
 * pkgdown website with a README home page and a "Data model" article that
   documents every table, column and counting rule from the schema; deployed
   to GitHub Pages by `pkgdown.yaml`.
-* The Parquet export is kept in `parquet/` of the repository, one version per
-  release, and listed with download links and usage examples on the
-  website's "Download the data" page.
+* All tables, including the article tables, are published as Parquet files
+  in the Hugging Face dataset `najkoja/jn_analytics`, one tagged commit per
+  release (named after the build date), with a generated dataset card. New
+  `jn_upload_hf()`; the pipeline exports and uploads after each build. The
+  Parquet files are no longer committed to `parquet/` of the repository.
+  The website's "Download the data" page links to Hugging Face.
+* `jn_publish()` exports all tables (see `jn_publish_tables()`); the article
+  tables are written as one file per publication year
+  (`articles/articles_2025.parquet`, ...).
+* The article tables are partitioned by `pub_year` in BigQuery, so queries
+  and exports for single years scan less. `article_first_authors` and
+  `article_agreements` have a new `pub_year` column.
+* `jn_source()` reads tables stored as a folder of files, so the article
+  tables can be analysed from a download as well as from BigQuery.
 * `normalize_ror()` brings ROR IDs into one canonical form.
 * A CC licence counts for the version of record whatever its start date in
   Crossref (`delay_in_days` is ignored), as in hoaddata 0.3.

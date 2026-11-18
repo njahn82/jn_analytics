@@ -11,8 +11,10 @@ builds one tidy data model in Google BigQuery from two open sources only,
 using the journal and institution lists of the cOAlition S
 [Journal Checker Tool](https://journalcheckertool.org/) and the
 [ESAC registry](https://esac-initiative.org/about/transformative-agreements/agreement-registry/).
-The dashboard, a browser-based data explorer and BigQuery users all read the
-same tables.
+All tables are published as Parquet files on
+[Hugging Face](https://huggingface.co/datasets/najkoja/jn_analytics), one
+tagged version per release. The dashboard, a browser-based data explorer and
+BigQuery users all read the same tables.
 
 ## Installation
 
@@ -27,8 +29,8 @@ devtools::install()
 | Layer | Tables | How |
 |----|----|----|
 | Package data | Reference tables: `journals`, `journal_issns`, `agreements`, `agreement_journals`, `agreement_institutions`, `portfolios` | `library(jnanalytics)` |
-| Parquet export | Reference tables and journal-level aggregates (about 50 MB), in `parquet/` of this repository, one version per release | `jn_source("parquet")` in a clone, or download single files |
-| BigQuery `subugoe-collaborative.jn_analytics` | All tables, including the article level | `jn_source("bigquery")` |
+| Hugging Face dataset [`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics) | All tables as Parquet, article tables split by year, one tagged version per release | `hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data`, then `jn_source("jn_data")`; or read single files with DuckDB, Python or arrow |
+| BigQuery `subugoe-collaborative.jn_analytics` | All tables | `jn_source("bigquery")` |
 
 ## Examples
 
@@ -38,7 +40,7 @@ By default they count research articles (OpenAlex types `article` and
 
 ``` r
 library(jnanalytics)
-src <- jn_source("parquet")
+src <- jn_source("jn_data")
 
 # Open access in hybrid and fully OA journals over time
 jn_oa(src, by = c("pub_year", "oa_model"))
@@ -49,9 +51,8 @@ jn_licenses(src, portfolio = "wiley", country = "DE", oa_model = "hybrid")
 # Crossref metadata coverage by OA model
 jn_metadata(src, by = c("pub_year", "oa_model"))
 
-# Article-level data is only in BigQuery
-bq <- jn_source("bigquery")
-jn_tbl(bq, "articles") |>
+# Article-level data, from the downloaded files or from BigQuery
+jn_tbl(src, "articles") |>
   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
   dplyr::collect()
 ```
@@ -76,8 +77,11 @@ The build is a [targets](https://docs.ropensci.org/targets/) pipeline
    GitHub Actions.
 
 The pipeline rebuilds the reference tables, the BigQuery tables and the
-Parquet export as needed. The workflow commits the updated reference data and
-Parquet files, so every release is versioned in this repository. A full rebuild scans about 245 GB in BigQuery.
+Parquet export as needed, and uploads the export to Hugging Face with
+`jn_upload_hf()`, tagged with the build date. The workflow commits the
+updated reference data to this repository. A full rebuild scans about 245 GB
+in BigQuery; the export of the article tables, read year by year from tables
+partitioned by `pub_year`, about 9 GB.
 
 ## Development note
 

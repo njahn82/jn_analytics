@@ -48,7 +48,9 @@ jn_upload_reference <- function(ref = NULL, config = jn_bq_config()) {
 #'
 #' Renders `inst/sql/<name>.sql` with [jn_sql()], reports the bytes the
 #' query will scan, writes the result to `<project>.<dataset>.<name>`
-#' (replacing it) and sets the column descriptions from [jn_schema()].
+#' (replacing it) and sets the column descriptions from [jn_schema()]. The
+#' article tables (`articles`, `article_first_authors`, `article_agreements`)
+#' are partitioned by `pub_year`, so queries for single years scan less.
 #'
 #' @param name Table and template name, e.g. `"articles"`.
 #' @param config See [jn_bq_config()].
@@ -79,16 +81,39 @@ jn_build_table <- function(name, config = jn_bq_config(), year_min = 2016L,
   }
 
   tbl <- bigrquery::bq_table(config$project, config$dataset, name)
-  bigrquery::bq_project_query(
-    config$billing, sql,
-    destination_table = tbl,
-    create_disposition = "CREATE_IF_NEEDED",
-    write_disposition = "WRITE_TRUNCATE"
+  # CREATE OR REPLACE, so the partitioning of a table can change between builds
+  job <- bigrquery::bq_perform_query(
+    bq_create_table_sql(tbl, sql, bq_partition_clause(name)),
+    billing = config$billing
   )
+  bigrquery::bq_job_wait(job, quiet = TRUE)
   set_bq_descriptions(tbl, name)
   meta <- bigrquery::bq_table_meta(tbl)
   cli::cli_inform("Built {.val {name}}: {meta$numRows} rows.")
   invisible(tbl)
+}
+
+jn_article_tables <- function() {
+  c("articles", "article_first_authors", "article_agreements")
+}
+
+# Article tables are partitioned by publication year: a query or export for
+# one year scans only that year
+bq_partition_clause <- function(name) {
+  if (name %in% jn_article_tables()) {
+    "PARTITION BY RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))"
+  } else {
+    ""
+  }
+}
+
+bq_create_table_sql <- function(tbl, sql, partition = "") {
+  paste0(
+    "CREATE OR REPLACE TABLE `", tbl$project, ".", tbl$dataset, ".", tbl$table, "`\n",
+    if (nzchar(partition)) paste0(partition, "\n"),
+    "AS\n",
+    sql
+  )
 }
 
 #' BigQuery fields for a jnanalytics table

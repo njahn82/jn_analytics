@@ -13,3 +13,4 @@
 ^CLAUDE\.md$
 ^\.claude$
 ^vignettes/articles$
+^plan_huggingface\.md$

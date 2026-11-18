@@ -10,5 +10,6 @@ jn_publish_tables()
 A character vector of table names.
 }
 \description{
-Tables exported by \code{\link[=jn_publish]{jn_publish()}}
+All tables of the data model except \code{release}, which \code{\link[=jn_publish]{jn_publish()}}
+writes together with \code{journal_year}.
 }

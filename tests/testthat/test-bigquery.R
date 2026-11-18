@@ -66,3 +66,30 @@ test_that("aggregates count the flip year and earlier years as hybrid", {
     expect_match(jn_sql(name), "a.pub_year <= j.oa_flip_year", fixed = TRUE, label = name)
   }
 })
+
+test_that("article templates return the schema columns, in order", {
+  selects <- grep("^SELECT doi", strsplit(jn_sql("article_first_authors"), "\n")[[1]], value = TRUE)
+  expect_length(selects, 2)
+  for (line in selects) {
+    columns <- sub(".* AS ", "", trimws(strsplit(sub("^SELECT (.*)$", "\\1", line), ",")[[1]]))
+    expect_equal(columns, jn_schema("article_first_authors")$column)
+  }
+
+  select <- tail(strsplit(jn_sql("article_agreements"), "\nSELECT\n", fixed = TRUE)[[1]], 1)
+  lines <- trimws(strsplit(sub("\nFROM .*", "", select), ",\n")[[1]])
+  expect_equal(sub("^[a-z]+\\.", "", lines), jn_schema("article_agreements")$column)
+})
+
+test_that("article tables are created partitioned by pub_year", {
+  tbl <- list(project = "p", dataset = "d", table = "articles")
+  sql <- bq_create_table_sql(tbl, "SELECT 1", bq_partition_clause("articles"))
+  expect_equal(
+    sql,
+    "CREATE OR REPLACE TABLE `p.d.articles`\nPARTITION BY RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))\nAS\nSELECT 1"
+  )
+  expect_equal(bq_partition_clause("journal_year"), "")
+  expect_equal(
+    bq_create_table_sql(list(project = "p", dataset = "d", table = "journal_year"), "SELECT 1"),
+    "CREATE OR REPLACE TABLE `p.d.journal_year`\nAS\nSELECT 1"
+  )
+})

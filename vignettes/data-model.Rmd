@@ -19,30 +19,23 @@ dashboard and quick analyses. All tables are built in Google BigQuery, in
 `subugoe-collaborative.jn_analytics`, from Crossref (`cr_instant`) and OpenAlex
 (`openalex_walden`), using the journal and institution lists of the
 cOAlition S Journal Checker Tool (JCT) and the ESAC registry.
-The reference tables and aggregates are also exported as Parquet files, kept
-in the `parquet/` folder of the package repository with one version per
-release; the column descriptions are stored in the Parquet metadata.
+All tables are also published as Parquet files in the Hugging Face dataset
+[`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics),
+one tagged version per release, with the article tables split by publication
+year; the column descriptions are stored in the Parquet metadata.
 
 ## Tables
 
 ```{r}
-tables <- tibble::tribble(
-  ~table, ~grain, ~where,
-  "journals", "one row per journal in a transformative agreement", "package, Parquet, BigQuery",
-  "journal_issns", "one row per ISSN", "package, Parquet, BigQuery",
-  "agreements", "one row per transformative agreement", "package, Parquet, BigQuery",
-  "agreement_journals", "one row per agreement and journal", "package, Parquet, BigQuery",
-  "agreement_institutions", "one row per agreement and participating institution", "package, Parquet, BigQuery",
-  "portfolios", "one row per dashboard page and agreement (ESAC ID); journals via agreement_journals", "package, Parquet, BigQuery",
-  "articles", "one row per work with a DOI", "BigQuery",
-  "article_first_authors", "one row per work, first-author institution and country", "BigQuery",
-  "article_agreements", "one row per work, agreement, author role and institution match", "BigQuery",
-  "journal_year", "works per journal, year and work type", "Parquet, BigQuery",
-  "journal_year_country", "as journal_year, per first-author country", "Parquet, BigQuery",
-  "journal_year_license", "works per journal, year, work type and CC licence", "Parquet, BigQuery",
-  "journal_year_country_license", "works per journal, year, work type, first-author country and CC licence", "Parquet, BigQuery",
-  "agreement_journal_year", "works covered per agreement, journal, year, work type and author role", "Parquet, BigQuery",
-  "release", "one row describing the release", "Parquet, BigQuery"
+tables <- read.csv(system.file("schema", "tables.csv", package = "jnanalytics"))
+reference <- c(
+  "journals", "journal_issns", "agreements", "agreement_journals",
+  "agreement_institutions", "portfolios"
+)
+tables$where <- ifelse(
+  tables$table %in% reference,
+  "package, Hugging Face, BigQuery",
+  "Hugging Face, BigQuery"
 )
 stopifnot(setequal(tables$table, jn_tables()))
 knitr::kable(

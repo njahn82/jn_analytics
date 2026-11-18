@@ -12,9 +12,14 @@
 # - BigQuery Data Editor on jn_analytics
 # The service account jn-analytics-build@subugoe-collaborative has these.
 #
-# Run with "check only" to test the login and permissions without a build:
-# it reads the snapshot dates, dry-runs the articles query and writes and
-# deletes a one-row test table in jn_analytics. Nothing is billed.
+# It also needs the repository secret HF_TOKEN: a fine-grained Hugging Face
+# token with write access to the dataset najkoja/jn_analytics only. The
+# pipeline uploads the Parquet export there, tagged with the build date.
+#
+# Run with "check only" to test the logins and permissions without a build:
+# it reads the snapshot dates, dry-runs the articles query, writes and
+# deletes a one-row test table in jn_analytics, and checks the Hugging Face
+# token and dataset. Nothing is billed.
 name: build
 
 on:
@@ -54,6 +59,9 @@ jobs:
             any::arrow
             any::jsonlite
 
+      - name: Install the Hugging Face CLI
+        run: pipx install huggingface_hub
+
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -73,6 +81,14 @@ jobs:
           cat("Wrote and deleted a test table in", config$dataset, "\n")
         shell: Rscript {0}
 
+      - name: Check Hugging Face token and dataset
+        if: inputs.check_only
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          hf auth whoami
+          hf datasets info najkoja/jn_analytics
+
       # The targets store remembers what was built, so unchanged steps are
       # skipped. GitHub drops caches unused for 7 days, so this mainly helps
       # reruns shortly after a build; a quarterly run usually starts fresh
@@ -86,19 +102,22 @@ jobs:
 
       - name: Run pipeline
         if: ${{ !inputs.check_only }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           targets::tar_make()
           print(targets::tar_progress_summary())
         shell: Rscript {0}
 
-      - name: Commit updated reference data and Parquet export
+      # The Parquet export goes to Hugging Face, not into git
+      - name: Commit updated reference data
         if: ${{ !inputs.check_only }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ data-raw/openalex_sources.csv data-raw/diagnostics/ parquet/
+          git add data/ data-raw/openalex_sources.csv data-raw/diagnostics/
           if git diff --cached --quiet; then
-            echo "No changes to the reference data or Parquet export."
+            echo "No changes to the reference data."
           else
             git commit -m "Update data ($(date -u +%Y-%m-%d))"
             git push

@@ -24,3 +24,27 @@ test_that("write_jn_parquet() stores column descriptions as metadata", {
   columns <- jsonlite::fromJSON(back$metadata$jn_columns)
   expect_equal(columns$issn, "Any ISSN of the journal")
 })
+
+test_that("jn_publish_tables() lists every table but release", {
+  expect_setequal(c(jn_publish_tables(), "release"), jn_tables())
+})
+
+test_that("jn_publish() rejects unknown tables", {
+  expect_snapshot(jn_publish(withr::local_tempdir(), tables = "nope"), error = TRUE)
+})
+
+test_that("partition_years() keeps year partitions only", {
+  expect_equal(partition_years(c("2017", "__NULL__", NA, "2016", "__UNPARTITIONED__")), 2016:2017)
+  expect_equal(partition_years(NA_character_), integer())
+})
+
+test_that("year_queries() read one partition each", {
+  config <- jn_bq_config(project = "p", dataset = "d")
+  expect_equal(
+    year_queries("articles", 2016:2017, config),
+    c(
+      "SELECT * FROM `p.d.articles` WHERE pub_year = 2016",
+      "SELECT * FROM `p.d.articles` WHERE pub_year = 2017"
+    )
+  )
+})

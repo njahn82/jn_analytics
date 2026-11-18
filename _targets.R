@@ -5,6 +5,7 @@
 # - a SQL template                       -> that table and everything built on it
 # - a new Crossref or OpenAlex snapshot  -> the BigQuery tables
 # - a new calendar year                  -> the BigQuery tables
+# - an exported file                     -> the upload to Hugging Face
 # BigQuery tables are represented by a small fingerprint (rows, last change),
 # so downstream steps rerun when an upstream table was rebuilt.
 library(targets)
@@ -43,6 +44,20 @@ upload_step <- function(name) {
       },
       list(NAME = name)
     )
+  )
+}
+
+export_step <- function(name) {
+  tar_target_raw(
+    paste0("export_", name),
+    substitute(
+      {
+        DEP
+        jn_publish("parquet", tables = NAME)
+      },
+      list(DEP = as.name(paste0("bq_", name)), NAME = name)
+    ),
+    format = "file"
   )
 }
 
@@ -132,9 +147,11 @@ list(
   )),
   bq_step("agreement_journal_year", c("sql_agreement_journal_year", "bq_article_agreements", "bq_articles", "upload_journals")),
 
-  # Parquet export of the reference tables and journal-level aggregates
+  # Parquet export into parquet/ (not in git), in the layout of the Hugging
+  # Face dataset: one file per table, article tables split by year. One
+  # target per article table, so a changed aggregate does not re-export them
   tar_target(
-    parquet,
+    export_tables,
     {
       list(
         upload_journals, upload_journal_issns, upload_agreements, upload_agreement_journals,
@@ -142,8 +159,18 @@ list(
         bq_journal_year_country, bq_journal_year_license,
         bq_journal_year_country_license, bq_agreement_journal_year
       )
-      jn_publish("parquet")
+      jn_publish("parquet", tables = setdiff(jn_publish_tables(), jn_article_tables()))
     },
     format = "file"
-  )
+  ),
+  export_step("articles"),
+  export_step("article_first_authors"),
+  export_step("article_agreements"),
+
+  # Upload to Hugging Face, tagged with the build date; reruns only when an
+  # exported file changed
+  tar_target(hf_release, {
+    list(export_tables, export_articles, export_article_first_authors, export_article_agreements)
+    jn_upload_hf("parquet")
+  })
 )
