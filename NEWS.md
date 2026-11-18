@@ -35,6 +35,13 @@ unchanged for code that relies on its tables.
   `article_agreements` have a new `pub_year` column.
 * `jn_source()` reads tables stored as a folder of files, so the article
   tables can be analysed from a download as well as from BigQuery.
+* Two new tables for drill-downs by institution, for example in the
+  dashboard: `agreement_articles` lists every eligible work per agreement,
+  participating institution and author role with its journal, type and OA
+  status (no joins needed), and `agreement_institution_year` sums it per
+  institution, year, OA model and work type. `agreement_articles` is
+  clustered by agreement and institution in BigQuery and sorted that way in
+  its yearly Parquet files, so a query for one agreement reads little data.
 * Agreement coverage counts a `parent` match only if the agreement lists at
   least two institutions below that parent (an umbrella organisation such as
   CSIC or the Leibniz Association). Otherwise the match is stored as

@@ -77,7 +77,7 @@ sql_file <- function(name) {
 bq_tables <- c(
   "articles", "article_first_authors", "journal_year", "journal_year_country",
   "journal_year_license", "journal_year_country_license", "article_agreements",
-  "agreement_journal_year"
+  "agreement_journal_year", "agreement_articles", "agreement_institution_year"
 )
 
 list(
@@ -146,6 +146,8 @@ list(
     "upload_agreement_journals", "upload_agreement_institutions"
   )),
   bq_step("agreement_journal_year", c("sql_agreement_journal_year", "bq_article_agreements", "bq_articles", "upload_journals")),
+  bq_step("agreement_articles", c("sql_agreement_articles", "bq_article_agreements", "bq_articles", "upload_journals")),
+  bq_step("agreement_institution_year", c("sql_agreement_institution_year", "bq_agreement_articles")),
 
   # Parquet export into parquet/ (not in git), in the layout of the Hugging
   # Face dataset: one file per table, article tables split by year. One
@@ -157,7 +159,8 @@ list(
         upload_journals, upload_journal_issns, upload_agreements, upload_agreement_journals,
         upload_agreement_institutions, upload_portfolios, bq_journal_year,
         bq_journal_year_country, bq_journal_year_license,
-        bq_journal_year_country_license, bq_agreement_journal_year
+        bq_journal_year_country_license, bq_agreement_journal_year,
+        bq_agreement_institution_year
       )
       jn_publish("parquet", tables = setdiff(jn_publish_tables(), jn_article_tables()))
     },
@@ -166,11 +169,15 @@ list(
   export_step("articles"),
   export_step("article_first_authors"),
   export_step("article_agreements"),
+  export_step("agreement_articles"),
 
   # Upload to Hugging Face, tagged with the build date; reruns only when an
   # exported file changed
   tar_target(hf_release, {
-    list(export_tables, export_articles, export_article_first_authors, export_article_agreements)
+    list(
+      export_tables, export_articles, export_article_first_authors,
+      export_article_agreements, export_agreement_articles
+    )
     jn_upload_hf("parquet")
   })
 )

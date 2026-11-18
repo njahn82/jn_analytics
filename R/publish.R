@@ -133,7 +133,7 @@ jn_publish_tables <- function() {
     "agreement_institutions", "portfolios", "journal_year",
     "journal_year_country", "journal_year_license",
     "journal_year_country_license", "agreement_journal_year",
-    jn_article_tables()
+    "agreement_institution_year", jn_article_tables()
   )
 }
 
@@ -169,7 +169,14 @@ publish_by_year <- function(name, path, config, max_gb, call = rlang::caller_env
     x <- coerce_to_schema(bq_download(tbl), name)
     jn_validate(x, name)
     file <- file.path(dir, sprintf("%s_%d.parquet", name, years[i]))
-    write_jn_parquet(x, name, file)
+    order <- export_order(name)
+    if (length(order) > 0) {
+      # Sorted, in small row groups: readers skip the groups of other agreements
+      x <- dplyr::arrange(x, dplyr::across(dplyr::all_of(order)))
+      write_jn_parquet(x, name, file, chunk_size = 50000)
+    } else {
+      write_jn_parquet(x, name, file)
+    }
     cli::cli_inform("Downloaded {.val {name}} {years[i]} ({nrow(x)} rows).")
     file
   }, "")
@@ -224,7 +231,7 @@ coerce_to_schema <- function(x, table) {
   tibble::as_tibble(x[intersect(schema$column, names(x))])
 }
 
-write_jn_parquet <- function(x, table, file) {
+write_jn_parquet <- function(x, table, file, ...) {
   schema <- jn_schema(table)
   arrow_table <- arrow::arrow_table(x)
   arrow_table$metadata$jn_table <- table
@@ -233,6 +240,6 @@ write_jn_parquet <- function(x, table, file) {
     as.list(rlang::set_names(schema$description, schema$column)),
     auto_unbox = TRUE
   ))
-  arrow::write_parquet(arrow_table, file, compression = "zstd")
+  arrow::write_parquet(arrow_table, file, compression = "zstd", ...)
   invisible(file)
 }

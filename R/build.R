@@ -101,17 +101,27 @@ jn_build_table <- function(name, config = jn_bq_config(), year_min = 2016L,
 }
 
 jn_article_tables <- function() {
-  c("articles", "article_first_authors", "article_agreements")
+  c("articles", "article_first_authors", "article_agreements", "agreement_articles")
 }
 
 # Article tables are partitioned by publication year: a query or export for
 # one year scans only that year
 bq_partition_clause <- function(name) {
-  if (name %in% jn_article_tables()) {
-    "PARTITION BY RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))"
-  } else {
-    ""
+  if (!name %in% jn_article_tables()) {
+    return("")
   }
+  partition <- "PARTITION BY RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))"
+  cluster <- export_order(name)
+  if (length(cluster) > 0) {
+    partition <- paste0(partition, "\nCLUSTER BY ", paste(cluster, collapse = ", "))
+  }
+  partition
+}
+
+# Columns a table is clustered by in BigQuery and sorted by in its Parquet
+# files, so that a query for one agreement reads few row groups
+export_order <- function(name) {
+  if (name == "agreement_articles") c("agreement_id", "ror") else character()
 }
 
 # Does a table's partitioning (from its BigQuery metadata) differ from the
@@ -170,8 +180,9 @@ set_bq_descriptions <- function(tbl, name) {
 #' Uploads the reference tables, then builds the article tables and the
 #' aggregates in dependency order: `articles`, `article_first_authors`,
 #' `journal_year`, `journal_year_country`, `journal_year_license`,
-#' `journal_year_country_license`, `article_agreements` and
-#' `agreement_journal_year`.
+#' `journal_year_country_license`, `article_agreements`,
+#' `agreement_journal_year`, `agreement_articles` and
+#' `agreement_institution_year`.
 #'
 #' @inheritParams jn_build_table
 #' @param tables Tables to build, in this order. Defaults to all.
@@ -204,6 +215,6 @@ jn_build_order <- function() {
     "articles", "article_first_authors", "journal_year",
     "journal_year_country", "journal_year_license",
     "journal_year_country_license", "article_agreements",
-    "agreement_journal_year"
+    "agreement_journal_year", "agreement_articles", "agreement_institution_year"
   )
 }

@@ -55,7 +55,7 @@ test_that("aggregate templates return the schema columns, in order", {
     lines <- trimws(strsplit(select, ",\n")[[1]])
     ifelse(grepl(" AS ", lines), sub(".* AS ([a-z_]+)$", "\\1", lines), sub("^[a-z_]+\\.", "", lines))
   }
-  for (name in c("journal_year", "journal_year_country", "journal_year_license", "journal_year_country_license", "agreement_journal_year")) {
+  for (name in c("journal_year", "journal_year_country", "journal_year_license", "journal_year_country_license", "agreement_journal_year", "agreement_articles", "agreement_institution_year")) {
     expect_equal(final_columns(jn_sql(name)), jn_schema(name)$column, label = name)
   }
 })
@@ -88,6 +88,11 @@ test_that("article tables are created partitioned by pub_year", {
     "CREATE OR REPLACE TABLE `p.d.articles`\nPARTITION BY RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))\nAS\nSELECT 1"
   )
   expect_equal(bq_partition_clause("journal_year"), "")
+  expect_match(
+    bq_partition_clause("agreement_articles"),
+    "RANGE_BUCKET(pub_year, GENERATE_ARRAY(2000, 2100, 1))\nCLUSTER BY agreement_id, ror",
+    fixed = TRUE
+  )
   expect_equal(
     bq_create_table_sql(list(project = "p", dataset = "d", table = "journal_year"), "SELECT 1"),
     "CREATE OR REPLACE TABLE `p.d.journal_year`\nAS\nSELECT 1"

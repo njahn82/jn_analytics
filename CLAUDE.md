@@ -70,6 +70,10 @@ pkgdown::build_site()                # website into docs/
 - `oa_model` per year: hybrid up to and including the OpenAlex
   `oa_flip_year`, fully OA afterwards. Publisher-wide flips (ACM from 2026)
   are curated in `data-raw/manual/oa_flips.csv`.
+- For the dashboard's drill-downs: `agreement_articles` (one row per
+  eligible work, agreement, participating institution and role, with OA
+  status; clustered and sorted by `agreement_id`, `ror`) and
+  `agreement_institution_year` (its sums per institution).
 - Agreement coverage: first author; `direct`, `child` and `parent` ROR
   matches count, a `parent` only if the agreement lists at least two
   institutions below it (else `parent_single`, e.g. European XFEL's
@@ -85,7 +89,7 @@ pkgdown::build_site()                # website into docs/
   "agreement_id")`, `agreement =` filter. Author-matched coverage is the
   separate `agreement_journal_year` table.
 - Analysis functions default to all journals (`oa_model = NULL`).
-- All 15 tables are published as Parquet in the Hugging Face dataset
+- All tables are published as Parquet in the Hugging Face dataset
   `najkoja/jn_analytics` (GitHub stays `njahn82/jn_analytics`), uploaded by
   `jn_upload_hf()` in the pipeline with the `HF_TOKEN` secret. Each release
   is a commit tagged with its build date (`release$snapshot_date`).

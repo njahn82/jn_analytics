@@ -38,5 +38,5 @@
     Condition
       Error in `check_table_name()`:
       ! `table` must be one of the jnanalytics tables.
-      i Available: "journals", "journal_issns", "agreements", "agreement_journals", "agreement_institutions", "portfolios", "articles", "article_first_authors", "article_agreements", "journal_year", "journal_year_country", "journal_year_country_license", "agreement_journal_year", "journal_year_license", and "release"
+      i Available: "journals", "journal_issns", "agreements", "agreement_journals", "agreement_institutions", "portfolios", "articles", "article_first_authors", "article_agreements", "journal_year", "journal_year_country", "journal_year_country_license", "agreement_journal_year", "journal_year_license", "release", "agreement_articles", and "agreement_institution_year"
 

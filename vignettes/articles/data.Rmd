@@ -92,7 +92,11 @@ knitr::kable(
 
 The article tables are split into one file per publication year
 (`pub_year`), for example `articles/articles_2025.parquet`. Read a single
-year, or the whole folder at once.
+year, or the whole folder at once. For questions about one agreement or
+institution, start with `agreement_institution_year` (counts per
+participating institution) and `agreement_articles` (the eligible works
+themselves, with journal, type and OA status, sorted by agreement); both
+need no joins.
 
 Every table and column is described in the [data model](data-model.html),
 including the counting rules. Two matter most when working with the files:

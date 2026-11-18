@@ -48,3 +48,12 @@ test_that("year_queries() read one partition each", {
     )
   )
 })
+
+test_that("write_jn_parquet() passes options such as the row group size", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("jsonlite")
+  file <- withr::local_tempfile(fileext = ".parquet")
+  x <- tibble::tibble(issn = rep("1557-7341", 10), issn_l = "0360-0300")
+  write_jn_parquet(x, "journal_issns", file, chunk_size = 4)
+  expect_equal(arrow::ParquetFileReader$create(file)$num_row_groups, 3)
+})

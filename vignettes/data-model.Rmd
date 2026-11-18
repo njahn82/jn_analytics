@@ -80,7 +80,11 @@ knitr::kable(
   listed institution the match is `parent_single` and does not count (ROR and
   OpenAlex list the 15 shareholders of European XFEL, among them CNRS and
   INFN, as its parents). `parent_single` and `related` matches are kept in
-  `article_agreements` but not counted. Agreements
+  `article_agreements` but not counted. `agreement_articles` lists the
+  counted works per participating institution, and
+  `agreement_institution_year` sums them; a work whose first author has two
+  participating institutions counts for both, so take agreement totals from
+  `agreement_journal_year`. Agreements
   missing from ESAC get an inferred period (`agreements.is_period_inferred`).
   Participating institutions come from the JCT; where it is wrong, a curated
   correction with its source adds or removes institutions

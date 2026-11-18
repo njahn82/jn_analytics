@@ -11,7 +11,12 @@ test_that("the targets pipeline is valid and builds tables in order", {
   expect_contains(upstream("bq_agreement_journal_year"), "bq_article_agreements")
   expect_setequal(
     upstream("hf_release"),
-    c("export_tables", "export_articles", "export_article_first_authors", "export_article_agreements")
+    c(
+      "export_tables", "export_articles", "export_article_first_authors",
+      "export_article_agreements", "export_agreement_articles"
+    )
   )
   expect_equal(upstream("export_articles"), "bq_articles")
+  expect_contains(upstream("bq_agreement_institution_year"), "bq_agreement_articles")
+  expect_contains(upstream("export_tables"), "bq_agreement_institution_year")
 })

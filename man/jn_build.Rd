@@ -31,6 +31,7 @@ The built BigQuery tables, invisibly.
 Uploads the reference tables, then builds the article tables and the
 aggregates in dependency order: \code{articles}, \code{article_first_authors},
 \code{journal_year}, \code{journal_year_country}, \code{journal_year_license},
-\code{journal_year_country_license}, \code{article_agreements} and
-\code{agreement_journal_year}.
+\code{journal_year_country_license}, \code{article_agreements},
+\code{agreement_journal_year}, \code{agreement_articles} and
+\code{agreement_institution_year}.
 }

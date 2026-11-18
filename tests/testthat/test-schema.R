@@ -3,7 +3,8 @@ test_that("the schema covers all tables of the data model", {
     "journals", "journal_issns", "agreements", "agreement_journals",
     "agreement_institutions", "article_agreements", "agreement_journal_year",
     "portfolios", "articles", "article_first_authors", "journal_year", "journal_year_country",
-    "journal_year_country_license", "journal_year_license", "release"
+    "journal_year_country_license", "journal_year_license", "release",
+    "agreement_articles", "agreement_institution_year"
   ))
   schema <- jn_schema()
   expect_in(schema$type, c("string", "integer", "boolean", "date"))
