@@ -93,3 +93,11 @@ test_that("article tables are created partitioned by pub_year", {
     "CREATE OR REPLACE TABLE `p.d.journal_year`\nAS\nSELECT 1"
   )
 })
+
+test_that("partitioning_changes() detects tables to drop before a rebuild", {
+  partitioned <- list(rangePartitioning = list(field = "pub_year"))
+  expect_true(partitioning_changes("articles", list()))
+  expect_false(partitioning_changes("articles", partitioned))
+  expect_false(partitioning_changes("journal_year", list()))
+  expect_true(partitioning_changes("journal_year", partitioned))
+})

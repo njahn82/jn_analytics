@@ -50,7 +50,8 @@ jn_upload_reference <- function(ref = NULL, config = jn_bq_config()) {
 #' query will scan, writes the result to `<project>.<dataset>.<name>`
 #' (replacing it) and sets the column descriptions from [jn_schema()]. The
 #' article tables (`articles`, `article_first_authors`, `article_agreements`)
-#' are partitioned by `pub_year`, so queries for single years scan less.
+#' are partitioned by `pub_year`, so queries for single years scan less. A
+#' table built with a different partitioning before is dropped first.
 #'
 #' @param name Table and template name, e.g. `"articles"`.
 #' @param config See [jn_bq_config()].
@@ -81,7 +82,13 @@ jn_build_table <- function(name, config = jn_bq_config(), year_min = 2016L,
   }
 
   tbl <- bigrquery::bq_table(config$project, config$dataset, name)
-  # CREATE OR REPLACE, so the partitioning of a table can change between builds
+  # CREATE OR REPLACE keeps a table's partitioning, so a table partitioned
+  # differently is dropped first
+  if (bigrquery::bq_table_exists(tbl) &&
+    partitioning_changes(name, bigrquery::bq_table_meta(tbl))) {
+    cli::cli_inform("Dropping {.val {name}} to change its partitioning.")
+    bigrquery::bq_table_delete(tbl)
+  }
   job <- bigrquery::bq_perform_query(
     bq_create_table_sql(tbl, sql, bq_partition_clause(name)),
     billing = config$billing
@@ -105,6 +112,14 @@ bq_partition_clause <- function(name) {
   } else {
     ""
   }
+}
+
+# Does a table's partitioning (from its BigQuery metadata) differ from the
+# one it is built with?
+partitioning_changes <- function(name, meta) {
+  current <- meta$rangePartitioning$field %||% ""
+  wanted <- if (nzchar(bq_partition_clause(name))) "pub_year" else ""
+  !identical(current, wanted)
 }
 
 bq_create_table_sql <- function(tbl, sql, partition = "") {
