@@ -80,16 +80,143 @@ same tables are in BigQuery,
 <div class="section level2">
 <h2 id="current-release">Current release<a class="anchor" aria-label="anchor" href="#current-release"></a>
 </h2>
-<p>The first release on Hugging Face is in preparation.</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Item</th>
+<th align="left">Value</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Version</td>
+<td align="left">0.1.0.9000</td>
+</tr>
+<tr class="even">
+<td align="left">Built</td>
+<td align="left">2026-11-18</td>
+</tr>
+<tr class="odd">
+<td align="left">Crossref snapshot</td>
+<td align="left">2026/09</td>
+</tr>
+<tr class="even">
+<td align="left">OpenAlex snapshot</td>
+<td align="left">2026-10-14</td>
+</tr>
+<tr class="odd">
+<td align="left">JCT snapshot</td>
+<td align="left">2026-11-09</td>
+</tr>
+<tr class="even">
+<td align="left">Publication years</td>
+<td align="left">2016–2026</td>
+</tr>
+</tbody>
+</table>
 <p>The links below point to the latest release. Every release is a
 tagged commit named after its build date. Read an earlier release with
 <code>.../resolve/&lt;date&gt;/&lt;file&gt;</code> instead of
 <code>.../resolve/main/&lt;file&gt;</code>, or with
 <code>--revision &lt;date&gt;</code> in <code>hf download</code>.</p>
+<p>Releases: <code>2026-11-18</code></p>
 </div>
 <div class="section level2">
 <h2 id="files">Files<a class="anchor" aria-label="anchor" href="#files"></a>
 </h2>
+<table class="table">
+<colgroup>
+<col width="35%">
+<col width="10%">
+<col width="54%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Table</th>
+<th align="right">Size</th>
+<th align="left">Download</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="data-model.html#journals"><code>journals</code></a></td>
+<td align="right">0.5 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journals.parquet" class="external-link">journals.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#journal-issns"><code>journal_issns</code></a></td>
+<td align="right">0.4 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_issns.parquet" class="external-link">journal_issns.parquet</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#agreements"><code>agreements</code></a></td>
+<td align="right">&lt; 0.1 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreements.parquet" class="external-link">agreements.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#agreement-journals"><code>agreement_journals</code></a></td>
+<td align="right">0.9 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_journals.parquet" class="external-link">agreement_journals.parquet</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#agreement-institutions"><code>agreement_institutions</code></a></td>
+<td align="right">0.4 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_institutions.parquet" class="external-link">agreement_institutions.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#portfolios"><code>portfolios</code></a></td>
+<td align="right">&lt; 0.1 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/portfolios.parquet" class="external-link">portfolios.parquet</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#journal-year"><code>journal_year</code></a></td>
+<td align="right">3.4 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year.parquet" class="external-link">journal_year.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#journal-year-country"><code>journal_year_country</code></a></td>
+<td align="right">23.5 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_country.parquet" class="external-link">journal_year_country.parquet</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#journal-year-license"><code>journal_year_license</code></a></td>
+<td align="right">2.3 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_license.parquet" class="external-link">journal_year_license.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#journal-year-country-license"><code>journal_year_country_license</code></a></td>
+<td align="right">15.4 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_country_license.parquet" class="external-link">journal_year_country_license.parquet</a></td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#agreement-journal-year"><code>agreement_journal_year</code></a></td>
+<td align="right">3.6 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_journal_year.parquet" class="external-link">agreement_journal_year.parquet</a></td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#articles"><code>articles</code></a></td>
+<td align="right">387.9 MB</td>
+<td align="left">
+<a href="https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/articles" class="external-link">articles/</a>
+(11 files, one per year)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#article-first-authors"><code>article_first_authors</code></a></td>
+<td align="right">356.3 MB</td>
+<td align="left">
+<a href="https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_first_authors" class="external-link">article_first_authors/</a>
+(11 files, one per year)</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="data-model.html#article-agreements"><code>article_agreements</code></a></td>
+<td align="right">109.2 MB</td>
+<td align="left">
+<a href="https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_agreements" class="external-link">article_agreements/</a>
+(10 files, one per year)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="data-model.html#release"><code>release</code></a></td>
+<td align="right">&lt; 0.1 MB</td>
+<td align="left"><a href="https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/release.parquet" class="external-link">release.parquet</a></td>
+</tr>
+</tbody>
+</table>
 <p>The article tables are split into one file per publication year
 (<code>pub_year</code>), for example
 <code>articles/articles_2025.parquet</code>. Read a single year, or the

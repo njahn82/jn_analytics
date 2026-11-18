@@ -13,14 +13,41 @@ Data and code are released under CC0.
 
 ## Current release
 
-The first release on Hugging Face is in preparation.
+| Item              | Value      |
+|:------------------|:-----------|
+| Version           | 0.1.0.9000 |
+| Built             | 2026-11-18 |
+| Crossref snapshot | 2026/09    |
+| OpenAlex snapshot | 2026-10-14 |
+| JCT snapshot      | 2026-11-09 |
+| Publication years | 2016–2026  |
 
 The links below point to the latest release. Every release is a tagged
 commit named after its build date. Read an earlier release with
 `.../resolve/<date>/<file>` instead of `.../resolve/main/<file>`, or
 with `--revision <date>` in `hf download`.
 
+Releases: `2026-11-18`
+
 ## Files
+
+| Table | Size | Download |
+|:---|---:|:---|
+| [`journals`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journals) | 0.5 MB | [journals.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journals.parquet) |
+| [`journal_issns`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-issns) | 0.4 MB | [journal_issns.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_issns.parquet) |
+| [`agreements`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreements) | \< 0.1 MB | [agreements.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreements.parquet) |
+| [`agreement_journals`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-journals) | 0.9 MB | [agreement_journals.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_journals.parquet) |
+| [`agreement_institutions`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-institutions) | 0.4 MB | [agreement_institutions.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_institutions.parquet) |
+| [`portfolios`](https://njahn82.github.io/jn_analytics/articles/data-model.html#portfolios) | \< 0.1 MB | [portfolios.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/portfolios.parquet) |
+| [`journal_year`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year) | 3.4 MB | [journal_year.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year.parquet) |
+| [`journal_year_country`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-country) | 23.5 MB | [journal_year_country.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_country.parquet) |
+| [`journal_year_license`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-license) | 2.3 MB | [journal_year_license.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_license.parquet) |
+| [`journal_year_country_license`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-country-license) | 15.4 MB | [journal_year_country_license.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year_country_license.parquet) |
+| [`agreement_journal_year`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-journal-year) | 3.6 MB | [agreement_journal_year.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_journal_year.parquet) |
+| [`articles`](https://njahn82.github.io/jn_analytics/articles/data-model.html#articles) | 387.9 MB | [articles/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/articles) (11 files, one per year) |
+| [`article_first_authors`](https://njahn82.github.io/jn_analytics/articles/data-model.html#article-first-authors) | 356.3 MB | [article_first_authors/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_first_authors) (11 files, one per year) |
+| [`article_agreements`](https://njahn82.github.io/jn_analytics/articles/data-model.html#article-agreements) | 109.2 MB | [article_agreements/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_agreements) (10 files, one per year) |
+| [`release`](https://njahn82.github.io/jn_analytics/articles/data-model.html#release) | \< 0.1 MB | [release.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/release.parquet) |
 
 The article tables are split into one file per publication year
 (`pub_year`), for example `articles/articles_2025.parquet`. Read a
