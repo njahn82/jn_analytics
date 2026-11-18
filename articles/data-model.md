@@ -7,30 +7,32 @@ from them for the dashboard and quick analyses. All tables are built in
 Google BigQuery, in `subugoe-collaborative.jn_analytics`, from Crossref
 (`cr_instant`) and OpenAlex (`openalex_walden`), using the journal and
 institution lists of the cOAlition S Journal Checker Tool (JCT) and the
-ESAC registry. The reference tables and aggregates are also exported as
-Parquet files, kept in the `parquet/` folder of the package repository
-with one version per release; the column descriptions are stored in the
-Parquet metadata.
+ESAC registry. All tables are also published as Parquet files in the
+Hugging Face dataset
+[`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics),
+one tagged version per release, with the article tables split by
+publication year; the column descriptions are stored in the Parquet
+metadata.
 
 ## Tables
 
 | Table | Grain | Available in |
 |:---|:---|:---|
-| [`journals`](#journals) | one row per journal in a transformative agreement | package, Parquet, BigQuery |
-| [`journal_issns`](#journal-issns) | one row per ISSN | package, Parquet, BigQuery |
-| [`agreements`](#agreements) | one row per transformative agreement | package, Parquet, BigQuery |
-| [`agreement_journals`](#agreement-journals) | one row per agreement and journal | package, Parquet, BigQuery |
-| [`agreement_institutions`](#agreement-institutions) | one row per agreement and participating institution | package, Parquet, BigQuery |
-| [`portfolios`](#portfolios) | one row per dashboard page and agreement (ESAC ID); journals via agreement_journals | package, Parquet, BigQuery |
-| [`articles`](#articles) | one row per work with a DOI | BigQuery |
-| [`article_first_authors`](#article-first-authors) | one row per work, first-author institution and country | BigQuery |
-| [`article_agreements`](#article-agreements) | one row per work, agreement, author role and institution match | BigQuery |
-| [`journal_year`](#journal-year) | works per journal, year and work type | Parquet, BigQuery |
-| [`journal_year_country`](#journal-year-country) | as journal_year, per first-author country | Parquet, BigQuery |
-| [`journal_year_license`](#journal-year-license) | works per journal, year, work type and CC licence | Parquet, BigQuery |
-| [`journal_year_country_license`](#journal-year-country-license) | works per journal, year, work type, first-author country and CC licence | Parquet, BigQuery |
-| [`agreement_journal_year`](#agreement-journal-year) | works covered per agreement, journal, year, work type and author role | Parquet, BigQuery |
-| [`release`](#release) | one row describing the release | Parquet, BigQuery |
+| [`journals`](#journals) | one row per journal in a transformative agreement | package, Hugging Face, BigQuery |
+| [`journal_issns`](#journal-issns) | one row per ISSN | package, Hugging Face, BigQuery |
+| [`agreements`](#agreements) | one row per transformative agreement | package, Hugging Face, BigQuery |
+| [`agreement_journals`](#agreement-journals) | one row per agreement and journal | package, Hugging Face, BigQuery |
+| [`agreement_institutions`](#agreement-institutions) | one row per agreement and participating institution | package, Hugging Face, BigQuery |
+| [`portfolios`](#portfolios) | one row per dashboard page and agreement (ESAC ID); journals via agreement_journals | package, Hugging Face, BigQuery |
+| [`articles`](#articles) | one row per work with a DOI | Hugging Face, BigQuery |
+| [`article_first_authors`](#article-first-authors) | one row per work, first-author institution and country | Hugging Face, BigQuery |
+| [`article_agreements`](#article-agreements) | one row per work, agreement, author role and institution match | Hugging Face, BigQuery |
+| [`journal_year`](#journal-year) | works per journal, year and work type | Hugging Face, BigQuery |
+| [`journal_year_country`](#journal-year-country) | as journal_year, per first-author country | Hugging Face, BigQuery |
+| [`journal_year_license`](#journal-year-license) | works per journal, year, work type and CC licence | Hugging Face, BigQuery |
+| [`journal_year_country_license`](#journal-year-country-license) | works per journal, year, work type, first-author country and CC licence | Hugging Face, BigQuery |
+| [`agreement_journal_year`](#agreement-journal-year) | works covered per agreement, journal, year, work type and author role | Hugging Face, BigQuery |
+| [`release`](#release) | one row describing the release | Hugging Face, BigQuery |
 
 ## Counting rules
 
@@ -85,7 +87,7 @@ Parquet metadata.
 ### journals
 
 one row per journal in a transformative agreement. Available in:
-package, Parquet, BigQuery.
+package, Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -98,7 +100,7 @@ package, Parquet, BigQuery.
 
 ### journal_issns
 
-one row per ISSN. Available in: package, Parquet, BigQuery.
+one row per ISSN. Available in: package, Hugging Face, BigQuery.
 
 | Column   | Type        | Description                |
 |:---------|:------------|:---------------------------|
@@ -107,8 +109,8 @@ one row per ISSN. Available in: package, Parquet, BigQuery.
 
 ### agreements
 
-one row per transformative agreement. Available in: package, Parquet,
-BigQuery.
+one row per transformative agreement. Available in: package, Hugging
+Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -123,7 +125,7 @@ BigQuery.
 
 ### agreement_journals
 
-one row per agreement and journal. Available in: package, Parquet,
+one row per agreement and journal. Available in: package, Hugging Face,
 BigQuery.
 
 | Column | Type | Description |
@@ -135,7 +137,7 @@ BigQuery.
 ### agreement_institutions
 
 one row per agreement and participating institution. Available in:
-package, Parquet, BigQuery.
+package, Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -147,7 +149,7 @@ package, Parquet, BigQuery.
 ### portfolios
 
 one row per dashboard page and agreement (ESAC ID); journals via
-agreement_journals. Available in: package, Parquet, BigQuery.
+agreement_journals. Available in: package, Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -157,7 +159,7 @@ agreement_journals. Available in: package, Parquet, BigQuery.
 
 ### articles
 
-one row per work with a DOI. Available in: BigQuery.
+one row per work with a DOI. Available in: Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -189,11 +191,12 @@ one row per work with a DOI. Available in: BigQuery.
 ### article_first_authors
 
 one row per work, first-author institution and country. Available in:
-BigQuery.
+Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
 | `doi` | string, key | → `articles` |
+| `pub_year` | integer | Publication year of the work, as `articles.pub_year`; the files are split by it |
 | `ror` | string, key | ROR ID of the institution, full URL; `NA` if OpenAlex found the country but no institution |
 | `country_code` | string, key | ISO-2, uppercase |
 | `country_source` | string | `institution` (country of a matched OpenAlex institution) or `affiliation` (country OpenAlex derived from the affiliation string only) |
@@ -201,11 +204,12 @@ BigQuery.
 ### article_agreements
 
 one row per work, agreement, author role and institution match.
-Available in: BigQuery.
+Available in: Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
 | `doi` | string, key | → `articles` |
+| `pub_year` | integer | Publication year of the work, as `articles.pub_year`; the files are split by it |
 | `agreement_id` | string, key | → `agreements`. The journal is covered by the agreement and the work’s OpenAlex publication date lies within the agreement period (Crossref `issued` is not used) |
 | `author_role` | string, key | `corresponding` or `first`: the author whose institution matched. A first author who is also corresponding author gives one row per role |
 | `ror_author` | string, key | ROR ID of the author’s institution (OpenAlex), full URL |
@@ -214,7 +218,8 @@ Available in: BigQuery.
 
 ### journal_year
 
-works per journal, year and work type. Available in: Parquet, BigQuery.
+works per journal, year and work type. Available in: Hugging Face,
+BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -238,7 +243,7 @@ works per journal, year and work type. Available in: Parquet, BigQuery.
 
 ### journal_year_country
 
-as journal_year, per first-author country. Available in: Parquet,
+as journal_year, per first-author country. Available in: Hugging Face,
 BigQuery.
 
 | Column | Type | Description |
@@ -264,8 +269,8 @@ BigQuery.
 
 ### journal_year_license
 
-works per journal, year, work type and CC licence. Available in:
-Parquet, BigQuery.
+works per journal, year, work type and CC licence. Available in: Hugging
+Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -279,7 +284,7 @@ Parquet, BigQuery.
 ### journal_year_country_license
 
 works per journal, year, work type, first-author country and CC licence.
-Available in: Parquet, BigQuery.
+Available in: Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -294,7 +299,7 @@ Available in: Parquet, BigQuery.
 ### agreement_journal_year
 
 works covered per agreement, journal, year, work type and author role.
-Available in: Parquet, BigQuery.
+Available in: Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|
@@ -311,7 +316,7 @@ Available in: Parquet, BigQuery.
 
 ### release
 
-one row describing the release. Available in: Parquet, BigQuery.
+one row describing the release. Available in: Hugging Face, BigQuery.
 
 | Column | Type | Description |
 |:---|:---|:---|

@@ -20,7 +20,7 @@ Every other table joins to them by `issn_l` or `agreement_id`.
 
 ## Analysis
 
-The same functions run on the Parquet export and on BigQuery.
+The same functions run on the Parquet files and on BigQuery.
 
 - [`jn_oa()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)
   [`jn_licenses()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)
@@ -45,8 +45,8 @@ validation, the BigQuery column descriptions and the Parquet metadata.
 ## Building the data
 
 Reference tables from the raw JCT and ESAC files, BigQuery tables from
-the SQL templates in `inst/sql`, and the Parquet export. Usually run
-through the targets pipeline in `_targets.R`.
+the SQL templates in `inst/sql`, the Parquet export and its upload to
+Hugging Face. Usually run through the targets pipeline in `_targets.R`.
 
 - [`jn_update_reference()`](https://njahn82.github.io/jn_analytics/reference/jn_update_reference.md)
   : Build the reference tables
@@ -77,6 +77,9 @@ through the targets pipeline in `_targets.R`.
 
 - [`jn_release()`](https://njahn82.github.io/jn_analytics/reference/jn_release.md)
   : Describe a release
+
+- [`jn_upload_hf()`](https://njahn82.github.io/jn_analytics/reference/jn_upload_hf.md)
+  : Upload a release to Hugging Face
 
 ## BigQuery
 

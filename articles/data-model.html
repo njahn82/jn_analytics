@@ -75,10 +75,11 @@ from them for the dashboard and quick analyses. All tables are built in
 Google BigQuery, in <code>subugoe-collaborative.jn_analytics</code>,
 from Crossref (<code>cr_instant</code>) and OpenAlex
 (<code>openalex_walden</code>), using the journal and institution lists
-of the cOAlition S Journal Checker Tool (JCT) and the ESAC registry. The
-reference tables and aggregates are also exported as Parquet files, kept
-in the <code>parquet/</code> folder of the package repository with one
-version per release; the column descriptions are stored in the Parquet
+of the cOAlition S Journal Checker Tool (JCT) and the ESAC registry. All
+tables are also published as Parquet files in the Hugging Face dataset
+<a href="https://huggingface.co/datasets/najkoja/jn_analytics" class="external-link"><code>najkoja/jn_analytics</code></a>,
+one tagged version per release, with the article tables split by
+publication year; the column descriptions are stored in the Parquet
 metadata.</p>
 <div class="section level2">
 <h2 id="tables">Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
@@ -86,8 +87,8 @@ metadata.</p>
 <table class="table">
 <colgroup>
 <col width="21%">
-<col width="59%">
-<col width="19%">
+<col width="57%">
+<col width="21%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Table</th>
@@ -98,83 +99,83 @@ metadata.</p>
 <tr class="odd">
 <td align="left"><a href="#journals"><code>journals</code></a></td>
 <td align="left">one row per journal in a transformative agreement</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#journal-issns"><code>journal_issns</code></a></td>
 <td align="left">one row per ISSN</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#agreements"><code>agreements</code></a></td>
 <td align="left">one row per transformative agreement</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#agreement-journals"><code>agreement_journals</code></a></td>
 <td align="left">one row per agreement and journal</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#agreement-institutions"><code>agreement_institutions</code></a></td>
 <td align="left">one row per agreement and participating
 institution</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#portfolios"><code>portfolios</code></a></td>
 <td align="left">one row per dashboard page and agreement (ESAC ID);
 journals via agreement_journals</td>
-<td align="left">package, Parquet, BigQuery</td>
+<td align="left">package, Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#articles"><code>articles</code></a></td>
 <td align="left">one row per work with a DOI</td>
-<td align="left">BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#article-first-authors"><code>article_first_authors</code></a></td>
 <td align="left">one row per work, first-author institution and
 country</td>
-<td align="left">BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#article-agreements"><code>article_agreements</code></a></td>
 <td align="left">one row per work, agreement, author role and
 institution match</td>
-<td align="left">BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#journal-year"><code>journal_year</code></a></td>
 <td align="left">works per journal, year and work type</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#journal-year-country"><code>journal_year_country</code></a></td>
 <td align="left">as journal_year, per first-author country</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#journal-year-license"><code>journal_year_license</code></a></td>
 <td align="left">works per journal, year, work type and CC licence</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#journal-year-country-license"><code>journal_year_country_license</code></a></td>
 <td align="left">works per journal, year, work type, first-author
 country and CC licence</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="#agreement-journal-year"><code>agreement_journal_year</code></a></td>
 <td align="left">works covered per agreement, journal, year, work type
 and author role</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="#release"><code>release</code></a></td>
 <td align="left">one row describing the release</td>
-<td align="left">Parquet, BigQuery</td>
+<td align="left">Hugging Face, BigQuery</td>
 </tr>
 </tbody>
 </table>
@@ -252,7 +253,7 @@ Crossref metadata,
 <h3 id="journals">journals<a class="anchor" aria-label="anchor" href="#journals"></a>
 </h3>
 <p>one row per journal in a transformative agreement. Available in:
-package, Parquet, BigQuery.</p>
+package, Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="7%">
@@ -312,7 +313,7 @@ hybrid in the aggregates</td>
 <div class="section level3">
 <h3 id="journal-issns">journal_issns<a class="anchor" aria-label="anchor" href="#journal-issns"></a>
 </h3>
-<p>one row per ISSN. Available in: package, Parquet, BigQuery.</p>
+<p>one row per ISSN. Available in: package, Hugging Face, BigQuery.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Column</th>
@@ -336,8 +337,8 @@ hybrid in the aggregates</td>
 <div class="section level3">
 <h3 id="agreements">agreements<a class="anchor" aria-label="anchor" href="#agreements"></a>
 </h3>
-<p>one row per transformative agreement. Available in: package, Parquet,
-BigQuery.</p>
+<p>one row per transformative agreement. Available in: package, Hugging
+Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="9%">
@@ -406,8 +407,8 @@ end of the year it was last listed in the Journal Checker Tool</td>
 <div class="section level3">
 <h3 id="agreement-journals">agreement_journals<a class="anchor" aria-label="anchor" href="#agreement-journals"></a>
 </h3>
-<p>one row per agreement and journal. Available in: package, Parquet,
-BigQuery.</p>
+<p>one row per agreement and journal. Available in: package, Hugging
+Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="9%">
@@ -446,7 +447,7 @@ data (hoaddata 0.3)</td>
 <h3 id="agreement-institutions">agreement_institutions<a class="anchor" aria-label="anchor" href="#agreement-institutions"></a>
 </h3>
 <p>one row per agreement and participating institution. Available in:
-package, Parquet, BigQuery.</p>
+package, Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="8%">
@@ -491,7 +492,7 @@ JCT data (hoaddata 0.3)</td>
 <h3 id="portfolios">portfolios<a class="anchor" aria-label="anchor" href="#portfolios"></a>
 </h3>
 <p>one row per dashboard page and agreement (ESAC ID); journals via
-agreement_journals. Available in: package, Parquet, BigQuery.</p>
+agreement_journals. Available in: package, Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="11%">
@@ -530,7 +531,8 @@ agreements in <code>agreement_journals</code>
 <div class="section level3">
 <h3 id="articles">articles<a class="anchor" aria-label="anchor" href="#articles"></a>
 </h3>
-<p>one row per work with a DOI. Available in: BigQuery.</p>
+<p>one row per work with a DOI. Available in: Hugging Face,
+BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="10%">
@@ -690,7 +692,7 @@ per author</td>
 <h3 id="article-first-authors">article_first_authors<a class="anchor" aria-label="anchor" href="#article-first-authors"></a>
 </h3>
 <p>one row per work, first-author institution and country. Available in:
-BigQuery.</p>
+Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="10%">
@@ -710,17 +712,23 @@ BigQuery.</p>
 </td>
 </tr>
 <tr class="even">
+<td align="left"><code>pub_year</code></td>
+<td align="left">integer</td>
+<td align="left">Publication year of the work, as
+<code>articles.pub_year</code>; the files are split by it</td>
+</tr>
+<tr class="odd">
 <td align="left"><code>ror</code></td>
 <td align="left">string, key</td>
 <td align="left">ROR ID of the institution, full URL; <code>NA</code> if
 OpenAlex found the country but no institution</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>country_code</code></td>
 <td align="left">string, key</td>
 <td align="left">ISO-2, uppercase</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>country_source</code></td>
 <td align="left">string</td>
 <td align="left">
@@ -735,7 +743,7 @@ the affiliation string only)</td>
 <h3 id="article-agreements">article_agreements<a class="anchor" aria-label="anchor" href="#article-agreements"></a>
 </h3>
 <p>one row per work, agreement, author role and institution match.
-Available in: BigQuery.</p>
+Available in: Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="4%">
@@ -755,13 +763,19 @@ Available in: BigQuery.</p>
 </td>
 </tr>
 <tr class="even">
+<td align="left"><code>pub_year</code></td>
+<td align="left">integer</td>
+<td align="left">Publication year of the work, as
+<code>articles.pub_year</code>; the files are split by it</td>
+</tr>
+<tr class="odd">
 <td align="left"><code>agreement_id</code></td>
 <td align="left">string, key</td>
 <td align="left">→ <code>agreements</code>. The journal is covered by
 the agreement and the work’s OpenAlex publication date lies within the
 agreement period (Crossref <code>issued</code> is not used)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>author_role</code></td>
 <td align="left">string, key</td>
 <td align="left">
@@ -769,18 +783,18 @@ agreement period (Crossref <code>issued</code> is not used)</td>
 author whose institution matched. A first author who is also
 corresponding author gives one row per role</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>ror_author</code></td>
 <td align="left">string, key</td>
 <td align="left">ROR ID of the author’s institution (OpenAlex), full
 URL</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>ror_agreement</code></td>
 <td align="left">string, key</td>
 <td align="left">ROR ID of the participating institution it matched</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>match_type</code></td>
 <td align="left">string</td>
 <td align="left">How the author’s institution relates to the
@@ -797,7 +811,7 @@ comparison with hoaddata 0.3, which counted it too</td>
 <div class="section level3">
 <h3 id="journal-year">journal_year<a class="anchor" aria-label="anchor" href="#journal-year"></a>
 </h3>
-<p>works per journal, year and work type. Available in: Parquet,
+<p>works per journal, year and work type. Available in: Hugging Face,
 BigQuery.</p>
 <table class="table">
 <colgroup>
@@ -916,8 +930,8 @@ indicator, not OA evidence</td>
 <div class="section level3">
 <h3 id="journal-year-country">journal_year_country<a class="anchor" aria-label="anchor" href="#journal-year-country"></a>
 </h3>
-<p>as journal_year, per first-author country. Available in: Parquet,
-BigQuery.</p>
+<p>as journal_year, per first-author country. Available in: Hugging
+Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="13%">
@@ -1045,7 +1059,7 @@ indicator, not OA evidence</td>
 <h3 id="journal-year-license">journal_year_license<a class="anchor" aria-label="anchor" href="#journal-year-license"></a>
 </h3>
 <p>works per journal, year, work type and CC licence. Available in:
-Parquet, BigQuery.</p>
+Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="5%">
@@ -1103,7 +1117,7 @@ fully OA journal the work is still OA)</td>
 <h3 id="journal-year-country-license">journal_year_country_license<a class="anchor" aria-label="anchor" href="#journal-year-country-license"></a>
 </h3>
 <p>works per journal, year, work type, first-author country and CC
-licence. Available in: Parquet, BigQuery.</p>
+licence. Available in: Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="6%">
@@ -1170,7 +1184,7 @@ fully OA journal the work is still OA)</td>
 <h3 id="agreement-journal-year">agreement_journal_year<a class="anchor" aria-label="anchor" href="#agreement-journal-year"></a>
 </h3>
 <p>works covered per agreement, journal, year, work type and author
-role. Available in: Parquet, BigQuery.</p>
+role. Available in: Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="10%">
@@ -1255,7 +1269,8 @@ OpenAlex</td>
 <div class="section level3">
 <h3 id="release">release<a class="anchor" aria-label="anchor" href="#release"></a>
 </h3>
-<p>one row describing the release. Available in: Parquet, BigQuery.</p>
+<p>one row describing the release. Available in: Hugging Face,
+BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="24%">

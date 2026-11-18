@@ -6,6 +6,9 @@ reports the bytes the query will scan, writes the result to
 `<project>.<dataset>.<name>` (replacing it) and sets the column
 descriptions from
 [`jn_schema()`](https://njahn82.github.io/jn_analytics/reference/jn_schema.md).
+The article tables (`articles`, `article_first_authors`,
+`article_agreements`) are partitioned by `pub_year`, so queries for
+single years scan less.
 
 ## Usage
 

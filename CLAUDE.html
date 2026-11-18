@@ -48,7 +48,7 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>                     <span class="co"># tests; devtools::test(filter = "analysis")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span>args <span class="op">=</span> <span class="st">"--no-manual"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"data-raw/reference.R"</span><span class="op">)</span>       <span class="co"># rebuild the bundled reference tables</span></span>
-<span><span class="fu">targets</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/targets/reference/tar_make.html" class="external-link">tar_make</a></span><span class="op">(</span><span class="op">)</span>                  <span class="co"># full pipeline: reference -&gt; BigQuery -&gt; Parquet</span></span>
+<span><span class="fu">targets</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/targets/reference/tar_make.html" class="external-link">tar_make</a></span><span class="op">(</span><span class="op">)</span>                  <span class="co"># full pipeline: reference -&gt; BigQuery -&gt; Parquet -&gt; Hugging Face</span></span>
 <span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span>                <span class="co"># website into docs/</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -83,7 +83,9 @@
 <code>portfolios</code> is one row per page and agreement (<code>agreement_id</code> = ESAC ID); a page’s journals come from <code>agreement_journals</code>. The ESAC IDs per page are essential to the user.</li>
 <li>Statistics per ESAC ID are journal-level (all works in the agreement’s journals, during the agreement period by default): <code>jn_oa(by = "agreement_id")</code>, <code>agreement =</code> filter. Author-matched coverage is the separate <code>agreement_journal_year</code> table.</li>
 <li>Analysis functions default to all journals (<code>oa_model = NULL</code>).</li>
-<li>The Parquet export (<code>parquet/</code>) is committed to the repo, by the <code>build</code> workflow after each build, so each release is shared and versioned in git.</li>
+<li>All 15 tables are published as Parquet in the Hugging Face dataset <code>najkoja/jn_analytics</code> (GitHub stays <code>njahn82/jn_analytics</code>), uploaded by <code><a href="reference/jn_upload_hf.html">jn_upload_hf()</a></code> in the pipeline with the <code>HF_TOKEN</code> secret. Each release is a commit tagged with its build date (<code>release$snapshot_date</code>). <code>parquet/</code> is the local export folder and is not in git (older exports stay in the git history).</li>
+<li>Article tables are partitioned by <code>pub_year</code> in BigQuery and exported as one file per year (<code>articles/articles_2025.parquet</code>); <code>article_first_authors</code> and <code>article_agreements</code> carry <code>pub_year</code> for this.</li>
+<li>BigQuery access through bigrquery only (no bigrquerystorage).</li>
 <li>The <code>build</code> workflow is started by hand (roughly quarterly); no cron.</li>
 </ul></div>
 <div class="section level2">

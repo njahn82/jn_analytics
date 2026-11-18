@@ -59,7 +59,7 @@
 <div class="page-header"><h1 id="jnanalytics">jnanalytics<a class="anchor" aria-label="anchor" href="#jnanalytics"></a>
 </h1></div>
 <p>Open data about the journal market in transformative agreements: which journals are covered, whether they are hybrid or fully open access, how much they publish, how much of it is openly licensed, how complete the metadata is, and how many articles fall under an agreement.</p>
-<p>jnanalytics succeeds <a href="https://github.com/subugoe/hoaddata" class="external-link">hoaddata</a>. It builds one tidy data model in Google BigQuery from two open sources only, <a href="https://www.crossref.org/" class="external-link">Crossref</a> and <a href="https://openalex.org/" class="external-link">OpenAlex</a>, using the journal and institution lists of the cOAlition S <a href="https://journalcheckertool.org/" class="external-link">Journal Checker Tool</a> and the <a href="https://esac-initiative.org/about/transformative-agreements/agreement-registry/" class="external-link">ESAC registry</a>. The dashboard, a browser-based data explorer and BigQuery users all read the same tables.</p>
+<p>jnanalytics succeeds <a href="https://github.com/subugoe/hoaddata" class="external-link">hoaddata</a>. It builds one tidy data model in Google BigQuery from two open sources only, <a href="https://www.crossref.org/" class="external-link">Crossref</a> and <a href="https://openalex.org/" class="external-link">OpenAlex</a>, using the journal and institution lists of the cOAlition S <a href="https://journalcheckertool.org/" class="external-link">Journal Checker Tool</a> and the <a href="https://esac-initiative.org/about/transformative-agreements/agreement-registry/" class="external-link">ESAC registry</a>. All tables are published as Parquet files on <a href="https://huggingface.co/datasets/najkoja/jn_analytics" class="external-link">Hugging Face</a>, one tagged version per release. The dashboard, a browser-based data explorer and BigQuery users all read the same tables.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -89,15 +89,16 @@
 <td><code><a href="https://github.com/njahn82/jn_analytics" class="external-link">library(jnanalytics)</a></code></td>
 </tr>
 <tr>
-<td>Parquet export</td>
-<td>Reference tables and journal-level aggregates (about 50 MB), in <code>parquet/</code> of this repository, one version per release</td>
+<td>Hugging Face dataset <a href="https://huggingface.co/datasets/najkoja/jn_analytics" class="external-link"><code>najkoja/jn_analytics</code></a>
+</td>
+<td>All tables as Parquet, article tables split by year, one tagged version per release</td>
 <td>
-<code>jn_source("parquet")</code> in a clone, or download single files</td>
+<code>hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data</code>, then <code>jn_source("jn_data")</code>; or read single files with DuckDB, Python or arrow</td>
 </tr>
 <tr>
 <td>BigQuery <code>subugoe-collaborative.jn_analytics</code>
 </td>
-<td>All tables, including the article level</td>
+<td>All tables</td>
 <td><code>jn_source("bigquery")</code></td>
 </tr>
 </tbody>
@@ -109,7 +110,7 @@
 <p>The analysis functions run unchanged on the Parquet files and on BigQuery. By default they count research articles (OpenAlex types <code>article</code> and <code>review</code>) in all journals.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/njahn82/jn_analytics" class="external-link">jnanalytics</a></span><span class="op">)</span></span>
-<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/jn_source.html">jn_source</a></span><span class="op">(</span><span class="st">"parquet"</span><span class="op">)</span></span>
+<span><span class="va">src</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/jn_source.html">jn_source</a></span><span class="op">(</span><span class="st">"jn_data"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Open access in hybrid and fully OA journals over time</span></span>
 <span><span class="fu"><a href="reference/jn_oa.html">jn_oa</a></span><span class="op">(</span><span class="va">src</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pub_year"</span>, <span class="st">"oa_model"</span><span class="op">)</span><span class="op">)</span></span>
@@ -120,9 +121,8 @@
 <span><span class="co"># Crossref metadata coverage by OA model</span></span>
 <span><span class="fu"><a href="reference/jn_oa.html">jn_metadata</a></span><span class="op">(</span><span class="va">src</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pub_year"</span>, <span class="st">"oa_model"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Article-level data is only in BigQuery</span></span>
-<span><span class="va">bq</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/jn_source.html">jn_source</a></span><span class="op">(</span><span class="st">"bigquery"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/jn_source.html">jn_tbl</a></span><span class="op">(</span><span class="va">bq</span>, <span class="st">"articles"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="co"># Article-level data, from the downloaded files or from BigQuery</span></span>
+<span><span class="fu"><a href="reference/jn_source.html">jn_tbl</a></span><span class="op">(</span><span class="va">src</span>, <span class="st">"articles"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">issn_l</span> <span class="op">==</span> <span class="st">"0360-0300"</span>, <span class="va">pub_year</span> <span class="op">==</span> <span class="fl">2025</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -139,7 +139,7 @@
 <li>Copy the current JCT files (<code>jct_jn_all.csv</code>, <code>jct_inst_all.csv</code>, <code>esac_df.csv</code>) from the <a href="https://github.com/njahn82/jct_data" class="external-link">jct_data</a> scraper into <code>data-raw/</code>, and gzip the journal list (<code>gzip -9 data-raw/jct_jn_all.csv</code>).</li>
 <li>Run <code><a href="https://docs.ropensci.org/targets/reference/tar_make.html" class="external-link">targets::tar_make()</a></code> locally, or start the <code>build</code> workflow in GitHub Actions.</li>
 </ol>
-<p>The pipeline rebuilds the reference tables, the BigQuery tables and the Parquet export as needed. The workflow commits the updated reference data and Parquet files, so every release is versioned in this repository. A full rebuild scans about 245 GB in BigQuery.</p>
+<p>The pipeline rebuilds the reference tables, the BigQuery tables and the Parquet export as needed, and uploads the export to Hugging Face with <code><a href="reference/jn_upload_hf.html">jn_upload_hf()</a></code>, tagged with the build date. The workflow commits the updated reference data to this repository. A full rebuild scans about 245 GB in BigQuery; the export of the article tables, read year by year from tables partitioned by <code>pub_year</code>, about 9 GB.</p>
 </div>
 <div class="section level2">
 <h2 id="development-note">Development note<a class="anchor" aria-label="anchor" href="#development-note"></a>

@@ -1,9 +1,12 @@
 # Connect to the jnanalytics tables
 
-The analysis functions read from a source: the Parquet files written by
+The analysis functions read from a source: a folder of Parquet files as
+written by
 [`jn_publish()`](https://njahn82.github.io/jn_analytics/reference/jn_publish.md)
-(journal-level tables only), or the BigQuery dataset (all tables,
-including the article-level `articles` and `article_first_authors`).
+or downloaded from Hugging Face, or the BigQuery dataset. A table is
+either one file (`journal_year.parquet`) or a folder of files
+(`articles/articles_2025.parquet`, ...); a download of only some tables
+or years works too.
 
 ## Usage
 
@@ -43,10 +46,13 @@ table that dplyr verbs can be applied to.
 
 ``` r
 if (FALSE) { # \dontrun{
-src <- jn_source("parquet")
+# hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
+src <- jn_source("jn_data")
 jn_tbl(src, "journal_year")
+jn_tbl(src, "articles") |>
+  dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
+  dplyr::collect()
 
-# Article-level data is only in BigQuery
 bq <- jn_source("bigquery")
 jn_tbl(bq, "articles") |>
   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>

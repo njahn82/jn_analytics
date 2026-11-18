@@ -90,7 +90,7 @@
       </dl></div><div class="section level2">
       <h2 id="analysis">Analysis<a class="anchor" aria-label="anchor" href="#analysis"></a></h2>
 
-      <div class="section-desc"><p>The same functions run on the Parquet export and on BigQuery.</p></div>
+      <div class="section-desc"><p>The same functions run on the Parquet files and on BigQuery.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -143,7 +143,7 @@
       </dl></div><div class="section level2">
       <h2 id="building-the-data">Building the data<a class="anchor" aria-label="anchor" href="#building-the-data"></a></h2>
 
-      <div class="section-desc"><p>Reference tables from the raw JCT and ESAC files, BigQuery tables from the SQL templates in <code>inst/sql</code>, and the Parquet export. Usually run through the targets pipeline in <code>_targets.R</code>.</p></div>
+      <div class="section-desc"><p>Reference tables from the raw JCT and ESAC files, BigQuery tables from the SQL templates in <code>inst/sql</code>, the Parquet export and its upload to Hugging Face. Usually run through the targets pipeline in <code>_targets.R</code>.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -212,6 +212,13 @@
 
         </dt>
         <dd>Describe a release</dd>
+
+        <dt>
+
+          <code><a href="jn_upload_hf.html">jn_upload_hf()</a></code>
+
+        </dt>
+        <dd>Upload a release to Hugging Face</dd>
       </dl></div><div class="section level2">
       <h2 id="bigquery">BigQuery<a class="anchor" aria-label="anchor" href="#bigquery"></a></h2>
 

@@ -1,47 +1,30 @@
 # Download the data
 
-The reference tables and journal-level aggregates are published as
-[Parquet](https://parquet.apache.org/) files with every release. They
-are kept in the
-[`parquet/`](https://github.com/njahn82/jn_analytics/tree/main/parquet)
-folder of the repository and can be read without an account or API key,
-in R, Python, DuckDB or any other tool that reads Parquet. Article-level
-tables (`articles`, `article_first_authors`, `article_agreements`) are
-only in BigQuery, `subugoe-collaborative.jn_analytics`.
+All tables of jnanalytics are published as
+[Parquet](https://parquet.apache.org/) files in the Hugging Face dataset
+[`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics):
+the reference tables, the journal-level aggregates and the article
+tables (`articles`, `article_first_authors`, `article_agreements`). They
+can be read without an account or API key, in R, Python, DuckDB or any
+other tool that reads Parquet. The same tables are in BigQuery,
+`subugoe-collaborative.jn_analytics`.
 
 Data and code are released under CC0.
 
 ## Current release
 
-| Item              | Value      |
-|:------------------|:-----------|
-| Version           | 0.1.0.9000 |
-| Built             | 2026-11-17 |
-| Crossref snapshot | 2026/09    |
-| OpenAlex snapshot | 2026-10-14 |
-| JCT snapshot      | 2026-11-09 |
-| Publication years | 2016–2026  |
+The first release on Hugging Face is in preparation.
 
-The links below always point to the latest release. Earlier releases are
-in the [history of
-`parquet/`](https://github.com/njahn82/jn_analytics/commits/main/parquet).
+The links below point to the latest release. Every release is a tagged
+commit named after its build date. Read an earlier release with
+`.../resolve/<date>/<file>` instead of `.../resolve/main/<file>`, or
+with `--revision <date>` in `hf download`.
 
 ## Files
 
-| Table | Rows | Size | Download |
-|:---|---:|---:|:---|
-| [`journals`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journals) | 19,401 | 0.5 MB | [journals.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journals.parquet) |
-| [`journal_issns`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-issns) | 35,190 | 0.4 MB | [journal_issns.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_issns.parquet) |
-| [`agreements`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreements) | 1,510 | \< 0.1 MB | [agreements.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/agreements.parquet) |
-| [`agreement_journals`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-journals) | 713,925 | 0.9 MB | [agreement_journals.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/agreement_journals.parquet) |
-| [`agreement_institutions`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-institutions) | 39,783 | 0.4 MB | [agreement_institutions.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/agreement_institutions.parquet) |
-| [`portfolios`](https://njahn82.github.io/jn_analytics/articles/data-model.html#portfolios) | 937 | \< 0.1 MB | [portfolios.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/portfolios.parquet) |
-| [`journal_year`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year) | 500,111 | 3.5 MB | [journal_year.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet) |
-| [`journal_year_country`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-country) | 3,812,236 | 23.5 MB | [journal_year_country.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year_country.parquet) |
-| [`journal_year_license`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-license) | 746,039 | 1.8 MB | [journal_year_license.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year_license.parquet) |
-| [`journal_year_country_license`](https://njahn82.github.io/jn_analytics/articles/data-model.html#journal-year-country-license) | 4,580,411 | 15.4 MB | [journal_year_country_license.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year_country_license.parquet) |
-| [`agreement_journal_year`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-journal-year) | 1,132,600 | 3.6 MB | [agreement_journal_year.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/agreement_journal_year.parquet) |
-| [`release`](https://njahn82.github.io/jn_analytics/articles/data-model.html#release) | 1 | \< 0.1 MB | [release.parquet](https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/release.parquet) |
+The article tables are split into one file per publication year
+(`pub_year`), for example `articles/articles_2025.parquet`. Read a
+single year, or the whole folder at once.
 
 Every table and column is described in the [data
 model](https://njahn82.github.io/jn_analytics/articles/data-model.md),
@@ -57,57 +40,78 @@ files:
 
 ## Usage
 
+### DuckDB
+
+DuckDB reads the files directly from Hugging Face, including all years
+of an article table at once:
+
+``` sql
+SELECT pub_year, oa_model,
+       sum(articles) AS articles,
+       sum(articles_oa) / sum(articles) AS share_oa
+FROM 'hf://datasets/najkoja/jn_analytics/journal_year.parquet'
+WHERE work_type IN ('article', 'review')
+GROUP BY ALL
+ORDER BY ALL;
+
+SELECT oa_status, count(*) AS n
+FROM 'hf://datasets/najkoja/jn_analytics/articles/*.parquet'
+WHERE pub_year = 2025 AND issn_l = '0360-0300'
+GROUP BY ALL;
+```
+
 ### R, with jnanalytics
 
-Download all files into one folder and use the analysis functions:
+Download the dataset with the [Hugging Face
+CLI](https://huggingface.co/docs/huggingface_hub/guides/cli)
+(`brew install hf` or `pipx install huggingface_hub`), all of it or only
+some tables:
+
+``` sh
+hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
+hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data \
+  --include "journal*.parquet" "agreement*.parquet" "portfolios.parquet" "release.parquet"
+```
+
+Then use the analysis functions; the article tables work too:
 
 ``` r
 
 library(jnanalytics)
-
-base_url <- "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/"
-files <- paste0(c(jn_publish_tables(), "release"), ".parquet")
-dir.create("jn_parquet")
-for (f in files) {
-  download.file(paste0(base_url, f), file.path("jn_parquet", f), mode = "wb")
-}
-
-src <- jn_source("jn_parquet")
+src <- jn_source("jn_data")
 jn_oa(src, by = c("pub_year", "oa_model"))
+
+jn_tbl(src, "articles") |>
+  dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
+  dplyr::collect()
 ```
 
 ### R, with arrow
 
 ``` r
 
-download.file(
-  "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet",
-  "journal_year.parquet", mode = "wb"
-)
+url <- "https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/journal_year.parquet"
+download.file(url, "journal_year.parquet", mode = "wb")
 journal_year <- arrow::read_parquet("journal_year.parquet")
 ```
 
 ### Python
 
+With pandas and huggingface_hub installed:
+
 ``` python
 import pandas as pd
 
-url = "https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet"
-journal_year = pd.read_parquet(url)
+journal_year = pd.read_parquet("hf://datasets/najkoja/jn_analytics/journal_year.parquet")
+articles_2025 = pd.read_parquet("hf://datasets/najkoja/jn_analytics/articles/articles_2025.parquet")
 ```
 
-### DuckDB
+Or with the datasets library, one configuration per table:
 
-DuckDB reads the files directly from their URL:
+``` python
+from datasets import load_dataset
 
-``` sql
-SELECT pub_year, oa_model,
-       sum(articles) AS articles,
-       sum(articles_oa) / sum(articles) AS share_oa
-FROM 'https://raw.githubusercontent.com/njahn82/jn_analytics/main/parquet/journal_year.parquet'
-WHERE work_type IN ('article', 'review')
-GROUP BY ALL
-ORDER BY ALL;
+journal_year = load_dataset("najkoja/jn_analytics", "journal_year")
 ```
 
 ## Column descriptions in the files
