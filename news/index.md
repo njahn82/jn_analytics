@@ -56,12 +56,14 @@ stays available unchanged for code that relies on its tables.
 
 - Two new tables for drill-downs by institution, for example in the
   dashboard: `agreement_articles` lists every eligible work per
-  agreement, participating institution and author role with its journal,
-  type and OA status (no joins needed), and `agreement_institution_year`
-  sums it per institution, year, OA model and work type.
-  `agreement_articles` is clustered by agreement and institution in
-  BigQuery and sorted that way in its yearly Parquet files, so a query
-  for one agreement reads little data.
+  agreement, institution and author role with its journal, type and OA
+  status (no joins needed), and `agreement_institution_year` sums it per
+  institution, year, OA model and work type. A work is attributed to the
+  participating institutions it matches directly or through a child, and
+  only otherwise, once, to the umbrella organisation through which it is
+  eligible (`match_type`). `agreement_articles` is clustered by
+  agreement and institution in BigQuery and sorted that way in its
+  yearly Parquet files, so a query for one agreement reads little data.
 
 - Agreement coverage counts a `parent` match only if the agreement lists
   at least two institutions whose only parent it is (an umbrella

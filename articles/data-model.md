@@ -78,8 +78,10 @@ metadata.
   INFN) and universities that run joint institutes with CSIC, whose
   authors are not covered by CSIC’s agreements. `parent_single` and
   `related` matches are kept in `article_agreements` but not counted.
-  `agreement_articles` lists the counted works per participating
-  institution, and `agreement_institution_year` sums them; a work whose
+  `agreement_articles` lists the counted works per institution: the
+  participating institutions a work matches directly or through a child,
+  or, only if there is none, the umbrella organisation through which it
+  is eligible; and `agreement_institution_year` sums them; a work whose
   first author has two participating institutions counts for both, so
   take agreement totals from `agreement_journal_year`. Agreements
   missing from ESAC get an inferred period
@@ -269,7 +271,8 @@ BigQuery.
 | Column | Type | Description |
 |:---|:---|:---|
 | `agreement_id` | string, key | → `agreements` |
-| `ror` | string, key | Participating institution through which the work is eligible (`ror_agreement` in `article_agreements`), full URL; → `agreement_institutions` |
+| `ror` | string, key | Institution the work is attributed to, full URL: a participating institution it matches (`direct` or `child`), else the umbrella organisation through which it is eligible (`parent`, e.g. the Chinese Academy of Sciences, not itself in `agreement_institutions`) |
+| `match_type` | string | `direct` or `child` (a participating institution) or `parent` (an umbrella organisation; only for works without a `direct` or `child` match), as in `article_agreements` |
 | `doi` | string, key | → `articles` |
 | `author_role` | string, key | `first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage; `corresponding` is sparse in OpenAlex |
 | `pub_year` | integer | Publication year, as `articles.pub_year`; the files are split by it |
@@ -386,7 +389,7 @@ work type and author role. Available in: Hugging Face, BigQuery.
 | Column | Type | Description |
 |:---|:---|:---|
 | `agreement_id` | string, key | → `agreements` |
-| `ror` | string, key | Participating institution, full URL; → `agreement_institutions` for its name |
+| `ror` | string, key | Participating institution, full URL (→ `agreement_institutions` for its name), or the umbrella organisation for works eligible only through it, as in `agreement_articles` |
 | `pub_year` | integer, key | Publication year |
 | `oa_model` | string, key | OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key |
 | `work_type` | string, key | OpenAlex work type, as in `articles` |

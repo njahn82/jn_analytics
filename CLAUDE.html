@@ -78,7 +78,7 @@
 <li>Country-agnostic: no <code>scope</code>; country tables use full counting.</li>
 <li>
 <code>oa_model</code> per year: hybrid up to and including the OpenAlex <code>oa_flip_year</code>, fully OA afterwards. Publisher-wide flips (ACM from 2026) are curated in <code>data-raw/manual/oa_flips.csv</code>.</li>
-<li>For the dashboard’s drill-downs: <code>agreement_articles</code> (one row per eligible work, agreement, participating institution and role, with OA status; clustered and sorted by <code>agreement_id</code>, <code>ror</code>) and <code>agreement_institution_year</code> (its sums per institution).</li>
+<li>For the dashboard’s drill-downs: <code>agreement_articles</code> (one row per eligible work, agreement, institution and role, with OA status; clustered and sorted by <code>agreement_id</code>, <code>ror</code>) and <code>agreement_institution_year</code> (its sums per institution). Works go to their closest matches only (direct or child participants; otherwise once to the umbrella organisation), never to every institute below an umbrella.</li>
 <li>Agreement coverage: first author; <code>direct</code>, <code>child</code> and <code>parent</code> ROR matches count, a <code>parent</code> only if the agreement lists at least two institutions whose only parent it is (else <code>parent_single</code>, e.g. European XFEL’s shareholders, universities with CSIC joint institutes); <code>parent_single</code> and <code>related</code> are stored but not counted; the period is checked with the OpenAlex publication date only.</li>
 <li>Participating institutions come from the JCT, corrected where it is wrong in <code>data-raw/manual/institution_corrections.csv</code> (with source).</li>
 <li>

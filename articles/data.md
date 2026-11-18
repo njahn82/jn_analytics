@@ -47,8 +47,8 @@ Releases: `2026-11-18`
 | [`agreement_institution_year`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-institution-year) | 1.3 MB | [agreement_institution_year.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/agreement_institution_year.parquet) |
 | [`articles`](https://njahn82.github.io/jn_analytics/articles/data-model.html#articles) | 385.1 MB | [articles/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/articles) (11 files, one per year) |
 | [`article_first_authors`](https://njahn82.github.io/jn_analytics/articles/data-model.html#article-first-authors) | 355.8 MB | [article_first_authors/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_first_authors) (11 files, one per year) |
-| [`article_agreements`](https://njahn82.github.io/jn_analytics/articles/data-model.html#article-agreements) | 109.4 MB | [article_agreements/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_agreements) (10 files, one per year) |
-| [`agreement_articles`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-articles) | 51.8 MB | [agreement_articles/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/agreement_articles) (10 files, one per year) |
+| [`article_agreements`](https://njahn82.github.io/jn_analytics/articles/data-model.html#article-agreements) | 109.8 MB | [article_agreements/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/article_agreements) (10 files, one per year) |
+| [`agreement_articles`](https://njahn82.github.io/jn_analytics/articles/data-model.html#agreement-articles) | 51.0 MB | [agreement_articles/](https://huggingface.co/datasets/najkoja/jn_analytics/tree/main/agreement_articles) (10 files, one per year) |
 | [`release`](https://njahn82.github.io/jn_analytics/articles/data-model.html#release) | \< 0.1 MB | [release.parquet](https://huggingface.co/datasets/najkoja/jn_analytics/resolve/main/release.parquet) |
 
 The article tables are split into one file per publication year

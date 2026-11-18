@@ -247,9 +247,11 @@ parents of European XFEL (among them CNRS and INFN) and universities
 that run joint institutes with CSIC, whose authors are not covered by
 CSIC’s agreements. <code>parent_single</code> and <code>related</code>
 matches are kept in <code>article_agreements</code> but not counted.
-<code>agreement_articles</code> lists the counted works per
-participating institution, and <code>agreement_institution_year</code>
-sums them; a work whose first author has two participating institutions
+<code>agreement_articles</code> lists the counted works per institution:
+the participating institutions a work matches directly or through a
+child, or, only if there is none, the umbrella organisation through
+which it is eligible; and <code>agreement_institution_year</code> sums
+them; a work whose first author has two participating institutions
 counts for both, so take agreement totals from
 <code>agreement_journal_year</code>. Agreements missing from ESAC get an
 inferred period (<code>agreements.is_period_inferred</code>).
@@ -924,9 +926,9 @@ author role, with journal and OA status. Available in: Hugging Face,
 BigQuery.</p>
 <table class="table">
 <colgroup>
-<col width="6%">
 <col width="5%">
-<col width="87%">
+<col width="4%">
+<col width="90%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Column</th>
@@ -943,19 +945,29 @@ BigQuery.</p>
 <tr class="even">
 <td align="left"><code>ror</code></td>
 <td align="left">string, key</td>
-<td align="left">Participating institution through which the work is
-eligible (<code>ror_agreement</code> in
-<code>article_agreements</code>), full URL; →
-<code>agreement_institutions</code>
-</td>
+<td align="left">Institution the work is attributed to, full URL: a
+participating institution it matches (<code>direct</code> or
+<code>child</code>), else the umbrella organisation through which it is
+eligible (<code>parent</code>, e.g. the Chinese Academy of Sciences, not
+itself in <code>agreement_institutions</code>)</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>match_type</code></td>
+<td align="left">string</td>
+<td align="left">
+<code>direct</code> or <code>child</code> (a
+participating institution) or <code>parent</code> (an umbrella
+organisation; only for works without a <code>direct</code> or
+<code>child</code> match), as in <code>article_agreements</code>
+</td>
+</tr>
+<tr class="even">
 <td align="left"><code>doi</code></td>
 <td align="left">string, key</td>
 <td align="left">→ <code>articles</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>author_role</code></td>
 <td align="left">string, key</td>
 <td align="left">
@@ -963,19 +975,19 @@ eligible (<code>ror_agreement</code> in
 <code>article_agreements</code>. Use <code>first</code> for agreement
 coverage; <code>corresponding</code> is sparse in OpenAlex</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>pub_year</code></td>
 <td align="left">integer</td>
 <td align="left">Publication year, as <code>articles.pub_year</code>;
 the files are split by it</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>issn_l</code></td>
 <td align="left">string</td>
 <td align="left">→ <code>journals</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>oa_model</code></td>
 <td align="left">string</td>
 <td align="left">OA model of the journal in that year:
@@ -984,27 +996,27 @@ the files are split by it</td>
 <code>journals.oa_model</code>. Derived from <code>issn_l</code> and
 <code>pub_year</code>, not a key</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>work_type</code></td>
 <td align="left">string</td>
 <td align="left">OpenAlex work type, as in <code>articles</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>is_oa</code></td>
 <td align="left">boolean</td>
 <td align="left">OA: every work in a fully OA journal-year; in a hybrid
 journal-year, a work with a CC licence in Crossref (as
 <code>articles_oa</code> in the aggregates)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>cc_license</code></td>
 <td align="left">string</td>
 <td align="left">CC licence in Crossref, as in
 <code>articles</code>
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>oa_status</code></td>
 <td align="left">string</td>
 <td align="left">OpenAlex OA status, as in <code>articles</code>
@@ -1498,8 +1510,11 @@ BigQuery.</p>
 <tr class="even">
 <td align="left"><code>ror</code></td>
 <td align="left">string, key</td>
-<td align="left">Participating institution, full URL; →
-<code>agreement_institutions</code> for its name</td>
+<td align="left">Participating institution, full URL (→
+<code>agreement_institutions</code> for its name), or the umbrella
+organisation for works eligible only through it, as in
+<code>agreement_articles</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>pub_year</code></td>
