@@ -127,7 +127,8 @@ release,jct_snapshot,string,FALSE,,Journal Checker Tool data used (last commit d
 release,pub_year_min,integer,FALSE,,First publication year covered
 release,pub_year_max,integer,FALSE,,Last publication year covered
 agreement_articles,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
-agreement_articles,ror,string,TRUE,agreement_institutions.ror,"Participating institution through which the work is eligible (`ror_agreement` in `article_agreements`), full URL; → `agreement_institutions`"
+agreement_articles,ror,string,TRUE,,"Institution the work is attributed to, full URL: a participating institution it matches (`direct` or `child`), else the umbrella organisation through which it is eligible (`parent`, e.g. the Chinese Academy of Sciences, not itself in `agreement_institutions`)"
+agreement_articles,match_type,string,FALSE,,"`direct` or `child` (a participating institution) or `parent` (an umbrella organisation; only for works without a `direct` or `child` match), as in `article_agreements`"
 agreement_articles,doi,string,TRUE,articles.doi,→ `articles`
 agreement_articles,author_role,string,TRUE,,"`first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage; `corresponding` is sparse in OpenAlex"
 agreement_articles,pub_year,integer,FALSE,,"Publication year, as `articles.pub_year`; the files are split by it"
@@ -138,7 +139,7 @@ agreement_articles,is_oa,boolean,FALSE,,"OA: every work in a fully OA journal-ye
 agreement_articles,cc_license,string,FALSE,,"CC licence in Crossref, as in `articles`"
 agreement_articles,oa_status,string,FALSE,,"OpenAlex OA status, as in `articles`"
 agreement_institution_year,agreement_id,string,TRUE,agreements.agreement_id,→ `agreements`
-agreement_institution_year,ror,string,TRUE,agreement_institutions.ror,"Participating institution, full URL; → `agreement_institutions` for its name"
+agreement_institution_year,ror,string,TRUE,,"Participating institution, full URL (→ `agreement_institutions` for its name), or the umbrella organisation for works eligible only through it, as in `agreement_articles`"
 agreement_institution_year,pub_year,integer,TRUE,,Publication year
 agreement_institution_year,oa_model,string,TRUE,,"OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key"
 agreement_institution_year,work_type,string,TRUE,,"OpenAlex work type, as in `articles`"

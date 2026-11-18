@@ -113,3 +113,10 @@ test_that("a parent counts only if the agreement lists two institutions whose on
   expect_match(sql, "COUNT(DISTINCT IF(n_parents = 1, inst_id, NULL)) AS listed_children", fixed = TRUE)
   expect_match(jn_sql("agreement_journal_year"), "match_type IN ('direct', 'child', 'parent')", fixed = TRUE)
 })
+
+test_that("agreement_articles attributes works to their closest matches", {
+  sql <- jn_sql("agreement_articles")
+  expect_match(sql, "WHERE has_close_match AND match_type IN ('direct', 'child')", fixed = TRUE)
+  expect_match(sql, "ror_author AS ror,\n    'parent' AS match_type", fixed = TRUE)
+  expect_match(sql, "WHERE NOT has_close_match", fixed = TRUE)
+})

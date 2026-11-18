@@ -1,15 +1,47 @@
 -- agreement_articles: works eligible under an agreement, one row per work,
--- agreement, participating institution and author role, with journal, year,
--- work type and OA status, for drill-downs (e.g. the dashboard) without
--- joins. Counted matches only (`direct`, `child`, `parent`), as in
--- agreement_journal_year. A work whose author has several participating
--- institutions has one row for each.
+-- agreement, institution and author role, with journal, year, work type and
+-- OA status, for drill-downs (e.g. the dashboard) without joins. Counted
+-- matches only (`direct`, `child`, `parent`), as in agreement_journal_year.
+-- A work is attributed to its closest matches: to the participating
+-- institutions it matches directly or through a child; only if it has no
+-- such match, once to the umbrella organisation (the parent, e.g. the
+-- Chinese Academy of Sciences) through which it is eligible. A work whose
+-- author has several participating institutions has one row for each.
 -- `is_oa`: every work in a fully OA journal-year is OA; in a hybrid
 -- journal-year, a work is OA with a CC licence in Crossref.
-WITH covered AS (
-  SELECT DISTINCT doi, agreement_id, ror_agreement, author_role
+WITH matches AS (
+  SELECT
+    doi,
+    agreement_id,
+    author_role,
+    ror_agreement,
+    ror_author,
+    match_type,
+    LOGICAL_OR(match_type IN ('direct', 'child'))
+      OVER (PARTITION BY doi, agreement_id, author_role) AS has_close_match
   FROM `{{dataset}}.article_agreements`
   WHERE match_type IN ('direct', 'child', 'parent')
+),
+
+covered AS (
+  SELECT
+    doi,
+    agreement_id,
+    author_role,
+    ror_agreement AS ror,
+    IF(LOGICAL_OR(match_type = 'direct'), 'direct', 'child') AS match_type
+  FROM matches
+  WHERE has_close_match AND match_type IN ('direct', 'child')
+  GROUP BY doi, agreement_id, author_role, ror_agreement
+  UNION ALL
+  SELECT DISTINCT
+    doi,
+    agreement_id,
+    author_role,
+    ror_author AS ror,
+    'parent' AS match_type
+  FROM matches
+  WHERE NOT has_close_match
 ),
 
 works AS (
@@ -33,7 +65,8 @@ works AS (
 
 SELECT
   c.agreement_id,
-  c.ror_agreement AS ror,
+  c.ror,
+  c.match_type,
   c.doi,
   c.author_role,
   w.pub_year,

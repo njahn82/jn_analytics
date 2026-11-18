@@ -71,9 +71,11 @@ pkgdown::build_site()                # website into docs/
   `oa_flip_year`, fully OA afterwards. Publisher-wide flips (ACM from 2026)
   are curated in `data-raw/manual/oa_flips.csv`.
 - For the dashboard's drill-downs: `agreement_articles` (one row per
-  eligible work, agreement, participating institution and role, with OA
-  status; clustered and sorted by `agreement_id`, `ror`) and
-  `agreement_institution_year` (its sums per institution).
+  eligible work, agreement, institution and role, with OA status; clustered
+  and sorted by `agreement_id`, `ror`) and `agreement_institution_year` (its
+  sums per institution). Works go to their closest matches only (direct or
+  child participants; otherwise once to the umbrella organisation), never
+  to every institute below an umbrella.
 - Agreement coverage: first author; `direct`, `child` and `parent` ROR
   matches count, a `parent` only if the agreement lists at least two
   institutions whose only parent it is (else `parent_single`, e.g. European

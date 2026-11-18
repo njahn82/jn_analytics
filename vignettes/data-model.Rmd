@@ -82,7 +82,9 @@ knitr::kable(
   European XFEL (among them CNRS and INFN) and universities that run joint
   institutes with CSIC, whose authors are not covered by CSIC's agreements. `parent_single` and `related` matches are kept in
   `article_agreements` but not counted. `agreement_articles` lists the
-  counted works per participating institution, and
+  counted works per institution: the participating institutions a work
+  matches directly or through a child, or, only if there is none, the
+  umbrella organisation through which it is eligible; and
   `agreement_institution_year` sums them; a work whose first author has two
   participating institutions counts for both, so take agreement totals from
   `agreement_journal_year`. Agreements
