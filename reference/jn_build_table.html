@@ -3,11 +3,13 @@
 query will scan, writes the result to &amp;lt;project&amp;gt;.&amp;lt;dataset&amp;gt;.&amp;lt;name&amp;gt;
 (replacing it) and sets the column descriptions from jn_schema(). The
 article tables (articles, article_first_authors, article_agreements)
-are partitioned by pub_year, so queries for single years scan less."><meta property="og:description" content="Renders inst/sql/&amp;lt;name&amp;gt;.sql with jn_sql(), reports the bytes the
+are partitioned by pub_year, so queries for single years scan less. A
+table built with a different partitioning before is dropped first."><meta property="og:description" content="Renders inst/sql/&amp;lt;name&amp;gt;.sql with jn_sql(), reports the bytes the
 query will scan, writes the result to &amp;lt;project&amp;gt;.&amp;lt;dataset&amp;gt;.&amp;lt;name&amp;gt;
 (replacing it) and sets the column descriptions from jn_schema(). The
 article tables (articles, article_first_authors, article_agreements)
-are partitioned by pub_year, so queries for single years scan less."></head><body>
+are partitioned by pub_year, so queries for single years scan less. A
+table built with a different partitioning before is dropped first."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -51,7 +53,8 @@ are partitioned by pub_year, so queries for single years scan less."></head><bod
 query will scan, writes the result to <code>&lt;project&gt;.&lt;dataset&gt;.&lt;name&gt;</code>
 (replacing it) and sets the column descriptions from <code><a href="jn_schema.html">jn_schema()</a></code>. The
 article tables (<code>articles</code>, <code>article_first_authors</code>, <code>article_agreements</code>)
-are partitioned by <code>pub_year</code>, so queries for single years scan less.</p>
+are partitioned by <code>pub_year</code>, so queries for single years scan less. A
+table built with a different partitioning before is dropped first.</p>
     </div>
 
     <div class="section level2">
