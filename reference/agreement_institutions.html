@@ -62,9 +62,9 @@ Institutions listed without a valid ROR ID are not included.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>A tibble with 4 columns:</p><ul><li><p><code>agreement_id</code> (string, key): → <code>agreements</code></p></li>
-<li><p><code>ror</code> (string, key): ROR ID of a participating institution as listed in the Journal Checker Tool, full URL</p></li>
-<li><p><code>inst_name</code> (string): Institution name as listed in the Journal Checker Tool</p></li>
-<li><p><code>last_seen</code> (date): Date the institution was last listed for this agreement in the Journal Checker Tool; <code>NA</code> if only listed in archived JCT data (hoaddata 0.3)</p></li>
+<li><p><code>ror</code> (string, key): ROR ID of a participating institution as listed in the Journal Checker Tool or added by a curated correction (<code>data-raw/manual/institution_corrections.csv</code>), full URL</p></li>
+<li><p><code>inst_name</code> (string): Institution name as listed in the Journal Checker Tool or in the curated correction</p></li>
+<li><p><code>last_seen</code> (date): Date the institution was last listed for this agreement in the Journal Checker Tool; <code>NA</code> if only listed in archived JCT data (hoaddata 0.3) or added by a curated correction</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="source">Source<a class="anchor" aria-label="anchor" href="#source"></a></h2>

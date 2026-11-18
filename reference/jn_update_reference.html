@@ -87,7 +87,11 @@ OpenAlex IDs and <code>oa_model</code> come from here; ISSNs that OpenAlex does 
 know fall back to the legacy file.</p></li>
 <li><p><code>legacy/journal_titles.csv</code>: fallback journal titles.</p></li>
 <li><p><code>manual/*.csv</code>: curated lookups (publisher names, OA models, publishers
-that flipped their journals to open access, exclusions, portfolios).</p></li>
+that flipped their journals to open access, exclusions, portfolios) and
+corrections of the JCT institution lists
+(<code>manual/institution_corrections.csv</code>: participating institutions to add
+to or remove from an agreement, with the source). A correction that no
+longer applies, because the JCT has changed, stops the build.</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

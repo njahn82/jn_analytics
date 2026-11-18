@@ -54,6 +54,14 @@ stays available unchanged for code that relies on its tables.
   reads tables stored as a folder of files, so the article tables can be
   analysed from a download as well as from BigQuery.
 
+- Curated corrections of the JCT institution lists in
+  `data-raw/manual/institution_corrections.csv` add or remove
+  participating institutions per agreement, with their source. The first
+  fixes `ieee2025cas` (IEEE and DRAA) against IEEE’s partner list: six
+  universities added, among them South China University of Technology,
+  and fourteen removed. A correction that no longer applies stops the
+  build.
+
 - [`normalize_ror()`](https://njahn82.github.io/jn_analytics/reference/normalize_ror.md)
   brings ROR IDs into one canonical form.
 

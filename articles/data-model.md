@@ -70,7 +70,11 @@ metadata.
   institution, one of its children or its parent (`direct`, `child`,
   `parent`). `related` institutions are kept in `article_agreements` but
   not counted. Agreements missing from ESAC get an inferred period
-  (`agreements.is_period_inferred`).
+  (`agreements.is_period_inferred`). Participating institutions come
+  from the JCT; where it is wrong, a curated correction with its source
+  adds or removes institutions
+  (`data-raw/manual/institution_corrections.csv`, for example
+  `ieee2025cas`).
 - **Journals of an agreement.** Journal-level statistics per agreement
   (`jn_oa(by = "agreement_id")`) count all works in the journals an
   agreement covers, by default only in the years it ran. A journal in
@@ -142,9 +146,9 @@ package, Hugging Face, BigQuery.
 | Column | Type | Description |
 |:---|:---|:---|
 | `agreement_id` | string, key | → `agreements` |
-| `ror` | string, key | ROR ID of a participating institution as listed in the Journal Checker Tool, full URL |
-| `inst_name` | string | Institution name as listed in the Journal Checker Tool |
-| `last_seen` | date | Date the institution was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3) |
+| `ror` | string, key | ROR ID of a participating institution as listed in the Journal Checker Tool or added by a curated correction (`data-raw/manual/institution_corrections.csv`), full URL |
+| `inst_name` | string | Institution name as listed in the Journal Checker Tool or in the curated correction |
+| `last_seen` | date | Date the institution was last listed for this agreement in the Journal Checker Tool; `NA` if only listed in archived JCT data (hoaddata 0.3) or added by a curated correction |
 
 ### portfolios
 

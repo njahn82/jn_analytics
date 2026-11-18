@@ -230,7 +230,11 @@ is a participating institution, one of its children or its parent
 <code>related</code> institutions are kept in
 <code>article_agreements</code> but not counted. Agreements missing from
 ESAC get an inferred period
-(<code>agreements.is_period_inferred</code>).</li>
+(<code>agreements.is_period_inferred</code>). Participating institutions
+come from the JCT; where it is wrong, a curated correction with its
+source adds or removes institutions
+(<code>data-raw/manual/institution_corrections.csv</code>, for example
+<code>ieee2025cas</code>).</li>
 <li>
 <strong>Journals of an agreement.</strong> Journal-level statistics
 per agreement (<code>jn_oa(by = "agreement_id")</code>) count all works
@@ -450,9 +454,9 @@ data (hoaddata 0.3)</td>
 package, Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
-<col width="8%">
 <col width="7%">
-<col width="83%">
+<col width="5%">
+<col width="86%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Column</th>
@@ -470,20 +474,22 @@ package, Hugging Face, BigQuery.</p>
 <td align="left"><code>ror</code></td>
 <td align="left">string, key</td>
 <td align="left">ROR ID of a participating institution as listed in the
-Journal Checker Tool, full URL</td>
+Journal Checker Tool or added by a curated correction
+(<code>data-raw/manual/institution_corrections.csv</code>), full
+URL</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inst_name</code></td>
 <td align="left">string</td>
-<td align="left">Institution name as listed in the Journal Checker
-Tool</td>
+<td align="left">Institution name as listed in the Journal Checker Tool
+or in the curated correction</td>
 </tr>
 <tr class="even">
 <td align="left"><code>last_seen</code></td>
 <td align="left">date</td>
 <td align="left">Date the institution was last listed for this agreement
 in the Journal Checker Tool; <code>NA</code> if only listed in archived
-JCT data (hoaddata 0.3)</td>
+JCT data (hoaddata 0.3) or added by a curated correction</td>
 </tr>
 </tbody>
 </table>

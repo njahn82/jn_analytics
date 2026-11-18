@@ -51,4 +51,7 @@ Expected files in `raw_dir` (see `data-raw/README.md`):
 
 - `manual/*.csv`: curated lookups (publisher names, OA models,
   publishers that flipped their journals to open access, exclusions,
-  portfolios).
+  portfolios) and corrections of the JCT institution lists
+  (`manual/institution_corrections.csv`: participating institutions to
+  add to or remove from an agreement, with the source). A correction
+  that no longer applies, because the JCT has changed, stops the build.
