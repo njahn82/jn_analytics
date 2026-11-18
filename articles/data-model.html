@@ -86,9 +86,9 @@ metadata.</p>
 </h2>
 <table class="table">
 <colgroup>
-<col width="21%">
-<col width="57%">
-<col width="21%">
+<col width="18%">
+<col width="63%">
+<col width="18%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Table</th>
@@ -146,30 +146,42 @@ institution match</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="even">
+<td align="left"><a href="#agreement-articles"><code>agreement_articles</code></a></td>
+<td align="left">one row per eligible work, agreement, participating
+institution and author role, with journal and OA status</td>
+<td align="left">Hugging Face, BigQuery</td>
+</tr>
+<tr class="odd">
 <td align="left"><a href="#journal-year"><code>journal_year</code></a></td>
 <td align="left">works per journal, year and work type</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><a href="#journal-year-country"><code>journal_year_country</code></a></td>
 <td align="left">as journal_year, per first-author country</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><a href="#journal-year-license"><code>journal_year_license</code></a></td>
 <td align="left">works per journal, year, work type and CC licence</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><a href="#journal-year-country-license"><code>journal_year_country_license</code></a></td>
 <td align="left">works per journal, year, work type, first-author
 country and CC licence</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><a href="#agreement-journal-year"><code>agreement_journal_year</code></a></td>
 <td align="left">works covered per agreement, journal, year, work type
 and author role</td>
+<td align="left">Hugging Face, BigQuery</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="#agreement-institution-year"><code>agreement_institution_year</code></a></td>
+<td align="left">works eligible per agreement, participating
+institution, year, OA model, work type and author role</td>
 <td align="left">Hugging Face, BigQuery</td>
 </tr>
 <tr class="odd">
@@ -226,13 +238,22 @@ countries counts in both. Take journal totals from
 its journal is in the agreement, its OpenAlex publication date lies
 within the agreement period, and its first author’s OpenAlex institution
 is a participating institution, one of its children or its parent
-(<code>direct</code>, <code>child</code>, <code>parent</code>).
-<code>related</code> institutions are kept in
-<code>article_agreements</code> but not counted. Agreements missing from
-ESAC get an inferred period
-(<code>agreements.is_period_inferred</code>). Participating institutions
-come from the JCT; where it is wrong, a curated correction with its
-source adds or removes institutions
+(<code>direct</code>, <code>child</code>, <code>parent</code>). A parent
+counts only if the agreement lists at least two institutions below it,
+as for an author who gives only “CSIC” or “Leibniz Association”; with
+one listed institution the match is <code>parent_single</code> and does
+not count (ROR and OpenAlex list the 15 shareholders of European XFEL,
+among them CNRS and INFN, as its parents). <code>parent_single</code>
+and <code>related</code> matches are kept in
+<code>article_agreements</code> but not counted.
+<code>agreement_articles</code> lists the counted works per
+participating institution, and <code>agreement_institution_year</code>
+sums them; a work whose first author has two participating institutions
+counts for both, so take agreement totals from
+<code>agreement_journal_year</code>. Agreements missing from ESAC get an
+inferred period (<code>agreements.is_period_inferred</code>).
+Participating institutions come from the JCT; where it is wrong, a
+curated correction with its source adds or removes institutions
 (<code>data-raw/manual/institution_corrections.csv</code>, for example
 <code>ieee2025cas</code>).</li>
 <li>
@@ -752,9 +773,9 @@ the affiliation string only)</td>
 Available in: Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
-<col width="4%">
-<col width="3%">
-<col width="92%">
+<col width="2%">
+<col width="2%">
+<col width="94%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Column</th>
@@ -806,10 +827,110 @@ URL</td>
 <td align="left">How the author’s institution relates to the
 participating one, per OpenAlex: <code>direct</code> (same),
 <code>child</code> (part of it, any depth), <code>parent</code> (the
-author’s institution contains it) or <code>related</code>.
-<code>direct</code>, <code>child</code> and <code>parent</code> count in
-<code>agreement_journal_year</code>; <code>related</code> is kept for
-comparison with hoaddata 0.3, which counted it too</td>
+author’s institution contains it, and the agreement lists at least two
+institutions it contains), <code>parent_single</code> (contains it, but
+it is the only one listed, e.g. a shareholder of European XFEL) or
+<code>related</code>. <code>direct</code>, <code>child</code> and
+<code>parent</code> count in <code>agreement_journal_year</code>;
+<code>parent_single</code> and <code>related</code> are kept for
+comparison (hoaddata 0.3 counted <code>related</code> too)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="agreement-articles">agreement_articles<a class="anchor" aria-label="anchor" href="#agreement-articles"></a>
+</h3>
+<p>one row per eligible work, agreement, participating institution and
+author role, with journal and OA status. Available in: Hugging Face,
+BigQuery.</p>
+<table class="table">
+<colgroup>
+<col width="6%">
+<col width="5%">
+<col width="87%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>agreement_id</code></td>
+<td align="left">string, key</td>
+<td align="left">→ <code>agreements</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><code>ror</code></td>
+<td align="left">string, key</td>
+<td align="left">Participating institution through which the work is
+eligible (<code>ror_agreement</code> in
+<code>article_agreements</code>), full URL; →
+<code>agreement_institutions</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>doi</code></td>
+<td align="left">string, key</td>
+<td align="left">→ <code>articles</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><code>author_role</code></td>
+<td align="left">string, key</td>
+<td align="left">
+<code>first</code> or <code>corresponding</code>, as in
+<code>article_agreements</code>. Use <code>first</code> for agreement
+coverage; <code>corresponding</code> is sparse in OpenAlex</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pub_year</code></td>
+<td align="left">integer</td>
+<td align="left">Publication year, as <code>articles.pub_year</code>;
+the files are split by it</td>
+</tr>
+<tr class="even">
+<td align="left"><code>issn_l</code></td>
+<td align="left">string</td>
+<td align="left">→ <code>journals</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>oa_model</code></td>
+<td align="left">string</td>
+<td align="left">OA model of the journal in that year:
+<code>hybrid</code> up to and including the OpenAlex
+<code>oa_flip_year</code> (a transition year), else as in
+<code>journals.oa_model</code>. Derived from <code>issn_l</code> and
+<code>pub_year</code>, not a key</td>
+</tr>
+<tr class="even">
+<td align="left"><code>work_type</code></td>
+<td align="left">string</td>
+<td align="left">OpenAlex work type, as in <code>articles</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>is_oa</code></td>
+<td align="left">boolean</td>
+<td align="left">OA: every work in a fully OA journal-year; in a hybrid
+journal-year, a work with a CC licence in Crossref (as
+<code>articles_oa</code> in the aggregates)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>cc_license</code></td>
+<td align="left">string</td>
+<td align="left">CC licence in Crossref, as in
+<code>articles</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>oa_status</code></td>
+<td align="left">string</td>
+<td align="left">OpenAlex OA status, as in <code>articles</code>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1251,6 +1372,94 @@ sum over them</td>
 <td align="left">Works covered by the agreement through a
 <code>direct</code>, <code>child</code> or <code>parent</code> match for
 this author role. A work under several agreements counts in each</td>
+</tr>
+<tr class="even">
+<td align="left"><code>articles_oa</code></td>
+<td align="left">integer</td>
+<td align="left">Of these, OA: all in a fully OA journal-year; in a
+hybrid journal-year, those with a CC licence in Crossref</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>articles_oa_openalex</code></td>
+<td align="left">integer</td>
+<td align="left">Of these, OA at the publisher according to
+OpenAlex</td>
+</tr>
+<tr class="even">
+<td align="left"><code>articles_with_cc_license</code></td>
+<td align="left">integer</td>
+<td align="left">Of these, with a CC licence in Crossref</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="agreement-institution-year">agreement_institution_year<a class="anchor" aria-label="anchor" href="#agreement-institution-year"></a>
+</h3>
+<p>works eligible per agreement, participating institution, year, OA
+model, work type and author role. Available in: Hugging Face,
+BigQuery.</p>
+<table class="table">
+<colgroup>
+<col width="8%">
+<col width="4%">
+<col width="86%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>agreement_id</code></td>
+<td align="left">string, key</td>
+<td align="left">→ <code>agreements</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><code>ror</code></td>
+<td align="left">string, key</td>
+<td align="left">Participating institution, full URL; →
+<code>agreement_institutions</code> for its name</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pub_year</code></td>
+<td align="left">integer, key</td>
+<td align="left">Publication year</td>
+</tr>
+<tr class="even">
+<td align="left"><code>oa_model</code></td>
+<td align="left">string, key</td>
+<td align="left">OA model of the journal in that year:
+<code>hybrid</code> up to and including the OpenAlex
+<code>oa_flip_year</code> (a transition year), else as in
+<code>journals.oa_model</code>. Derived from <code>issn_l</code> and
+<code>pub_year</code>, not a key</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>work_type</code></td>
+<td align="left">string, key</td>
+<td align="left">OpenAlex work type, as in <code>articles</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><code>author_role</code></td>
+<td align="left">string, key</td>
+<td align="left">
+<code>first</code> or <code>corresponding</code>, as in
+<code>article_agreements</code>. Use <code>first</code> for agreement
+coverage; <code>corresponding</code> is sparse in OpenAlex</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>articles</code></td>
+<td align="left">integer</td>
+<td align="left">Works eligible under the agreement through this
+participating institution (a <code>direct</code>, <code>child</code> or
+<code>parent</code> match). A work with several participating
+institutions counts for each, so never sum over institutions; take
+agreement totals from <code>agreement_journal_year</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><code>articles_oa</code></td>

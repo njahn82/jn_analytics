@@ -3,8 +3,9 @@
 Uploads the reference tables, then builds the article tables and the
 aggregates in dependency order: `articles`, `article_first_authors`,
 `journal_year`, `journal_year_country`, `journal_year_license`,
-`journal_year_country_license`, `article_agreements` and
-`agreement_journal_year`.
+`journal_year_country_license`, `article_agreements`,
+`agreement_journal_year`, `agreement_articles` and
+`agreement_institution_year`.
 
 ## Usage
 

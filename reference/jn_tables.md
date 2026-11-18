@@ -23,5 +23,6 @@ jn_tables()
 #>  [9] "article_agreements"           "journal_year"                
 #> [11] "journal_year_country"         "journal_year_country_license"
 #> [13] "agreement_journal_year"       "journal_year_license"        
-#> [15] "release"                     
+#> [15] "release"                      "agreement_articles"          
+#> [17] "agreement_institution_year"  
 ```

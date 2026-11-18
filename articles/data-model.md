@@ -27,11 +27,13 @@ metadata.
 | [`articles`](#articles) | one row per work with a DOI | Hugging Face, BigQuery |
 | [`article_first_authors`](#article-first-authors) | one row per work, first-author institution and country | Hugging Face, BigQuery |
 | [`article_agreements`](#article-agreements) | one row per work, agreement, author role and institution match | Hugging Face, BigQuery |
+| [`agreement_articles`](#agreement-articles) | one row per eligible work, agreement, participating institution and author role, with journal and OA status | Hugging Face, BigQuery |
 | [`journal_year`](#journal-year) | works per journal, year and work type | Hugging Face, BigQuery |
 | [`journal_year_country`](#journal-year-country) | as journal_year, per first-author country | Hugging Face, BigQuery |
 | [`journal_year_license`](#journal-year-license) | works per journal, year, work type and CC licence | Hugging Face, BigQuery |
 | [`journal_year_country_license`](#journal-year-country-license) | works per journal, year, work type, first-author country and CC licence | Hugging Face, BigQuery |
 | [`agreement_journal_year`](#agreement-journal-year) | works covered per agreement, journal, year, work type and author role | Hugging Face, BigQuery |
+| [`agreement_institution_year`](#agreement-institution-year) | works eligible per agreement, participating institution, year, OA model, work type and author role | Hugging Face, BigQuery |
 | [`release`](#release) | one row describing the release | Hugging Face, BigQuery |
 
 ## Counting rules
@@ -68,11 +70,20 @@ metadata.
   the agreement, its OpenAlex publication date lies within the agreement
   period, and its first author’s OpenAlex institution is a participating
   institution, one of its children or its parent (`direct`, `child`,
-  `parent`). `related` institutions are kept in `article_agreements` but
-  not counted. Agreements missing from ESAC get an inferred period
-  (`agreements.is_period_inferred`). Participating institutions come
-  from the JCT; where it is wrong, a curated correction with its source
-  adds or removes institutions
+  `parent`). A parent counts only if the agreement lists at least two
+  institutions below it, as for an author who gives only “CSIC” or
+  “Leibniz Association”; with one listed institution the match is
+  `parent_single` and does not count (ROR and OpenAlex list the 15
+  shareholders of European XFEL, among them CNRS and INFN, as its
+  parents). `parent_single` and `related` matches are kept in
+  `article_agreements` but not counted. `agreement_articles` lists the
+  counted works per participating institution, and
+  `agreement_institution_year` sums them; a work whose first author has
+  two participating institutions counts for both, so take agreement
+  totals from `agreement_journal_year`. Agreements missing from ESAC get
+  an inferred period (`agreements.is_period_inferred`). Participating
+  institutions come from the JCT; where it is wrong, a curated
+  correction with its source adds or removes institutions
   (`data-raw/manual/institution_corrections.csv`, for example
   `ieee2025cas`).
 - **Journals of an agreement.** Journal-level statistics per agreement
@@ -218,7 +229,27 @@ Available in: Hugging Face, BigQuery.
 | `author_role` | string, key | `corresponding` or `first`: the author whose institution matched. A first author who is also corresponding author gives one row per role |
 | `ror_author` | string, key | ROR ID of the author’s institution (OpenAlex), full URL |
 | `ror_agreement` | string, key | ROR ID of the participating institution it matched |
-| `match_type` | string | How the author’s institution relates to the participating one, per OpenAlex: `direct` (same), `child` (part of it, any depth), `parent` (the author’s institution contains it) or `related`. `direct`, `child` and `parent` count in `agreement_journal_year`; `related` is kept for comparison with hoaddata 0.3, which counted it too |
+| `match_type` | string | How the author’s institution relates to the participating one, per OpenAlex: `direct` (same), `child` (part of it, any depth), `parent` (the author’s institution contains it, and the agreement lists at least two institutions it contains), `parent_single` (contains it, but it is the only one listed, e.g. a shareholder of European XFEL) or `related`. `direct`, `child` and `parent` count in `agreement_journal_year`; `parent_single` and `related` are kept for comparison (hoaddata 0.3 counted `related` too) |
+
+### agreement_articles
+
+one row per eligible work, agreement, participating institution and
+author role, with journal and OA status. Available in: Hugging Face,
+BigQuery.
+
+| Column | Type | Description |
+|:---|:---|:---|
+| `agreement_id` | string, key | → `agreements` |
+| `ror` | string, key | Participating institution through which the work is eligible (`ror_agreement` in `article_agreements`), full URL; → `agreement_institutions` |
+| `doi` | string, key | → `articles` |
+| `author_role` | string, key | `first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage; `corresponding` is sparse in OpenAlex |
+| `pub_year` | integer | Publication year, as `articles.pub_year`; the files are split by it |
+| `issn_l` | string | → `journals` |
+| `oa_model` | string | OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key |
+| `work_type` | string | OpenAlex work type, as in `articles` |
+| `is_oa` | boolean | OA: every work in a fully OA journal-year; in a hybrid journal-year, a work with a CC licence in Crossref (as `articles_oa` in the aggregates) |
+| `cc_license` | string | CC licence in Crossref, as in `articles` |
+| `oa_status` | string | OpenAlex OA status, as in `articles` |
 
 ### journal_year
 
@@ -314,6 +345,24 @@ Available in: Hugging Face, BigQuery.
 | `work_type` | string, key | OpenAlex work type, as in `articles` |
 | `author_role` | string, key | `first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage (as in hoaddata 0.3 and the dashboard); `corresponding` is kept for comparison. Roles overlap: never sum over them |
 | `articles` | integer | Works covered by the agreement through a `direct`, `child` or `parent` match for this author role. A work under several agreements counts in each |
+| `articles_oa` | integer | Of these, OA: all in a fully OA journal-year; in a hybrid journal-year, those with a CC licence in Crossref |
+| `articles_oa_openalex` | integer | Of these, OA at the publisher according to OpenAlex |
+| `articles_with_cc_license` | integer | Of these, with a CC licence in Crossref |
+
+### agreement_institution_year
+
+works eligible per agreement, participating institution, year, OA model,
+work type and author role. Available in: Hugging Face, BigQuery.
+
+| Column | Type | Description |
+|:---|:---|:---|
+| `agreement_id` | string, key | → `agreements` |
+| `ror` | string, key | Participating institution, full URL; → `agreement_institutions` for its name |
+| `pub_year` | integer, key | Publication year |
+| `oa_model` | string, key | OA model of the journal in that year: `hybrid` up to and including the OpenAlex `oa_flip_year` (a transition year), else as in `journals.oa_model`. Derived from `issn_l` and `pub_year`, not a key |
+| `work_type` | string, key | OpenAlex work type, as in `articles` |
+| `author_role` | string, key | `first` or `corresponding`, as in `article_agreements`. Use `first` for agreement coverage; `corresponding` is sparse in OpenAlex |
+| `articles` | integer | Works eligible under the agreement through this participating institution (a `direct`, `child` or `parent` match). A work with several participating institutions counts for each, so never sum over institutions; take agreement totals from `agreement_journal_year` |
 | `articles_oa` | integer | Of these, OA: all in a fully OA journal-year; in a hybrid journal-year, those with a CC licence in Crossref |
 | `articles_oa_openalex` | integer | Of these, OA at the publisher according to OpenAlex |
 | `articles_with_cc_license` | integer | Of these, with a CC licence in Crossref |
