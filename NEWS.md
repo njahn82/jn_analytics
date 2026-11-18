@@ -35,6 +35,14 @@ unchanged for code that relies on its tables.
   `article_agreements` have a new `pub_year` column.
 * `jn_source()` reads tables stored as a folder of files, so the article
   tables can be analysed from a download as well as from BigQuery.
+* Agreement coverage counts a `parent` match only if the agreement lists at
+  least two institutions below that parent (an umbrella organisation such as
+  CSIC or the Leibniz Association). Otherwise the match is stored as
+  `parent_single` and not counted: ROR and OpenAlex list the shareholders of
+  European XFEL (CNRS, INFN, CEA and others) as its parents, which made their
+  authors eligible under every agreement listing European XFEL. In 2025 this
+  removes about 22,000 of 25,000 work-agreement pairs counted only through a
+  parent.
 * Curated corrections of the JCT institution lists in
   `data-raw/manual/institution_corrections.csv` add or remove participating
   institutions per agreement, with their source. The first fixes

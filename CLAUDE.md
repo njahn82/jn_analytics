@@ -71,8 +71,12 @@ pkgdown::build_site()                # website into docs/
   `oa_flip_year`, fully OA afterwards. Publisher-wide flips (ACM from 2026)
   are curated in `data-raw/manual/oa_flips.csv`.
 - Agreement coverage: first author; `direct`, `child` and `parent` ROR
-  matches count, `related` is stored but not counted; the period is checked
-  with the OpenAlex publication date only.
+  matches count, a `parent` only if the agreement lists at least two
+  institutions below it (else `parent_single`, e.g. European XFEL's
+  shareholders); `parent_single` and `related` are stored but not counted;
+  the period is checked with the OpenAlex publication date only.
+- Participating institutions come from the JCT, corrected where it is wrong
+  in `data-raw/manual/institution_corrections.csv` (with source).
 - `portfolios` is one row per page and agreement (`agreement_id` = ESAC ID);
   a page's journals come from `agreement_journals`. The ESAC IDs per page
   are essential to the user.

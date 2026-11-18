@@ -51,3 +51,15 @@ test_that("jn_validate() checks controlled vocabularies", {
 test_that("jn_schema() rejects unknown tables", {
   expect_snapshot(jn_schema("jn_ind"), error = TRUE)
 })
+
+test_that("jn_validate() knows every match type", {
+  x <- tibble::tibble(
+    doi = paste0("10.1/", 1:5), pub_year = 2025L, agreement_id = "a1",
+    author_role = "first", ror_author = paste0("https://ror.org/0", 1:5),
+    ror_agreement = "https://ror.org/09",
+    match_type = c("direct", "child", "parent", "parent_single", "related")
+  )
+  expect_no_error(jn_validate(x, "article_agreements"))
+  x$match_type[1] <- "grandparent"
+  expect_error(jn_validate(x, "article_agreements"), "non-canonical")
+})

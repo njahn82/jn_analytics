@@ -6,7 +6,11 @@
 -- Crossref `issued` is deliberately not used), and the
 -- author's OpenAlex institution relates to a participating institution:
 -- `direct` (same), `child` (part of it, any depth), `parent` (contains it) or
--- `related`. `direct`, `child` and `parent` count in the aggregates.
+-- `related`. A parent is an umbrella organisation (e.g. CSIC, Leibniz
+-- Association) only if the agreement lists at least two institutions below
+-- it; otherwise the match is `parent_single`, as for the 15 shareholders
+-- that ROR and OpenAlex list as parents of European XFEL.
+-- `direct`, `child` and `parent` count in the aggregates.
 WITH listed AS (
   SELECT
     ai.agreement_id,
@@ -17,6 +21,16 @@ WITH listed AS (
   FROM `{{dataset}}.agreement_institutions` AS ai
   INNER JOIN `{{openalex}}.institutions` AS i
     ON LOWER(i.ror) = ai.ror
+),
+
+-- Per agreement and parent organisation: how many listed institutions it
+-- contains
+parent_cover AS (
+  SELECT agreement_id, ancestor AS parent_id, COUNT(DISTINCT inst_id) AS listed_children
+  FROM listed
+  CROSS JOIN UNNEST(lineage) AS ancestor
+  WHERE ancestor != inst_id
+  GROUP BY agreement_id, parent_id
 ),
 
 -- OpenAlex institutions that match each participating institution
@@ -36,12 +50,18 @@ expanded AS (
   INNER JOIN descendants AS d
     ON d.inst_id = l.inst_id
   UNION ALL
-  SELECT l.agreement_id, l.ror_agreement, ancestor, 'parent', 3
+  SELECT
+    l.agreement_id, l.ror_agreement, ancestor,
+    IF(pc.listed_children >= 2, 'parent', 'parent_single'),
+    IF(pc.listed_children >= 2, 3, 4)
   FROM listed AS l
   CROSS JOIN UNNEST(l.lineage) AS ancestor
+  INNER JOIN parent_cover AS pc
+    ON pc.agreement_id = l.agreement_id
+    AND pc.parent_id = ancestor
   WHERE ancestor != l.inst_id
   UNION ALL
-  SELECT l.agreement_id, l.ror_agreement, a.id, 'related', 4
+  SELECT l.agreement_id, l.ror_agreement, a.id, 'related', 5
   FROM listed AS l
   CROSS JOIN UNNEST(l.associated_institutions) AS a
   WHERE LOWER(a.relationship) = 'related'

@@ -101,3 +101,9 @@ test_that("partitioning_changes() detects tables to drop before a rebuild", {
   expect_false(partitioning_changes("journal_year", list()))
   expect_true(partitioning_changes("journal_year", partitioned))
 })
+
+test_that("a parent counts only if the agreement lists two institutions below it", {
+  sql <- jn_sql("article_agreements")
+  expect_match(sql, "IF(pc.listed_children >= 2, 'parent', 'parent_single')", fixed = TRUE)
+  expect_match(jn_sql("agreement_journal_year"), "match_type IN ('direct', 'child', 'parent')", fixed = TRUE)
+})

@@ -173,7 +173,7 @@ invalid_values <- function(x, column) {
     ror_author = ,
     ror_agreement = startsWith(x, "https://ror.org/"),
     author_role = x %in% c("corresponding", "first"),
-    match_type = x %in% c("direct", "child", "parent", "related"),
+    match_type = x %in% c("direct", "child", "parent", "parent_single", "related"),
     rep(TRUE, length(x))
   )
   x[!ok]

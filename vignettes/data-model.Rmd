@@ -74,8 +74,13 @@ knitr::kable(
 - **Agreements.** A work is covered by an agreement if its journal is in the
   agreement, its OpenAlex publication date lies within the agreement period,
   and its first author's OpenAlex institution is a participating institution,
-  one of its children or its parent (`direct`, `child`, `parent`). `related`
-  institutions are kept in `article_agreements` but not counted. Agreements
+  one of its children or its parent (`direct`, `child`, `parent`). A parent
+  counts only if the agreement lists at least two institutions below it, as
+  for an author who gives only "CSIC" or "Leibniz Association"; with one
+  listed institution the match is `parent_single` and does not count (ROR and
+  OpenAlex list the 15 shareholders of European XFEL, among them CNRS and
+  INFN, as its parents). `parent_single` and `related` matches are kept in
+  `article_agreements` but not counted. Agreements
   missing from ESAC get an inferred period (`agreements.is_period_inferred`).
   Participating institutions come from the JCT; where it is wrong, a curated
   correction with its source adds or removes institutions
