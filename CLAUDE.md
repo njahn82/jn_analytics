@@ -86,10 +86,10 @@ pkgdown::build_site()                # website into docs/
   `agreement_institution_year` (its sums per institution).
 - Agreement coverage: first author; `direct`, `child` and `parent` ROR
   matches count, a `parent` only if the agreement lists at least two
-  institutions below it (else `parent_single`, e.g. European XFEL’s
-  shareholders); `parent_single` and `related` are stored but not
-  counted; the period is checked with the OpenAlex publication date
-  only.
+  institutions whose only parent it is (else `parent_single`,
+  e.g. European XFEL’s shareholders, universities with CSIC joint
+  institutes); `parent_single` and `related` are stored but not counted;
+  the period is checked with the OpenAlex publication date only.
 - Participating institutions come from the JCT, corrected where it is
   wrong in `data-raw/manual/institution_corrections.csv` (with source).
 - `portfolios` is one row per page and agreement (`agreement_id` = ESAC

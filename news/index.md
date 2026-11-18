@@ -64,13 +64,14 @@ stays available unchanged for code that relies on its tables.
   for one agreement reads little data.
 
 - Agreement coverage counts a `parent` match only if the agreement lists
-  at least two institutions below that parent (an umbrella organisation
-  such as CSIC or the Leibniz Association). Otherwise the match is
-  stored as `parent_single` and not counted: ROR and OpenAlex list the
-  shareholders of European XFEL (CNRS, INFN, CEA and others) as its
-  parents, which made their authors eligible under every agreement
-  listing European XFEL. In 2025 this removes about 22,000 of 25,000
-  work-agreement pairs counted only through a parent.
+  at least two institutions whose only parent it is (an umbrella
+  organisation such as CSIC or the Chinese Academy of Sciences).
+  Otherwise the match is stored as `parent_single` and not counted:
+  OpenAlex lists the shareholders of European XFEL (CNRS, INFN, CEA and
+  others) as its parents, and Spanish universities as parents of joint
+  institutes with CSIC, which made their authors eligible under
+  agreements that do not cover them. In 2025 this removes about 24,000
+  of 25,500 work-agreement pairs counted only through a parent.
 
 - Curated corrections of the JCT institution lists in
   `data-raw/manual/institution_corrections.csv` add or remove

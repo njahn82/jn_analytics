@@ -239,13 +239,14 @@ its journal is in the agreement, its OpenAlex publication date lies
 within the agreement period, and its first author’s OpenAlex institution
 is a participating institution, one of its children or its parent
 (<code>direct</code>, <code>child</code>, <code>parent</code>). A parent
-counts only if the agreement lists at least two institutions below it,
-as for an author who gives only “CSIC” or “Leibniz Association”; with
-one listed institution the match is <code>parent_single</code> and does
-not count (ROR and OpenAlex list the 15 shareholders of European XFEL,
-among them CNRS and INFN, as its parents). <code>parent_single</code>
-and <code>related</code> matches are kept in
-<code>article_agreements</code> but not counted.
+counts only if the agreement lists at least two institutions whose only
+parent it is, as for an author who gives only “CSIC” or “Chinese Academy
+of Sciences”; otherwise the match is <code>parent_single</code> and does
+not count. This leaves out the shareholders that OpenAlex lists as
+parents of European XFEL (among them CNRS and INFN) and universities
+that run joint institutes with CSIC, whose authors are not covered by
+CSIC’s agreements. <code>parent_single</code> and <code>related</code>
+matches are kept in <code>article_agreements</code> but not counted.
 <code>agreement_articles</code> lists the counted works per
 participating institution, and <code>agreement_institution_year</code>
 sums them; a work whose first author has two participating institutions
@@ -270,6 +271,81 @@ compute them, for example <code>articles_oa / articles</code> or, for
 Crossref metadata,
 <code>articles_with_orcid / articles_in_crossref</code>.</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="differences-from-hoaddata-0-3">Differences from hoaddata 0.3<a class="anchor" aria-label="anchor" href="#differences-from-hoaddata-0-3"></a>
+</h2>
+<p>jnanalytics succeeds hoaddata 0.3, which remains available unchanged.
+Agreement coverage is counted differently, so the numbers are not
+directly comparable:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>hoaddata 0.3</th>
+<th>jnanalytics</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Author</td>
+<td>First author’s OpenAlex institutions</td>
+<td>Same</td>
+</tr>
+<tr class="even">
+<td>Participating institution itself</td>
+<td>Counts</td>
+<td>Counts (<code>direct</code>)</td>
+</tr>
+<tr class="odd">
+<td>Institutions below it</td>
+<td>Direct children only</td>
+<td>Any depth, from the OpenAlex <code>lineage</code>
+(<code>child</code>)</td>
+</tr>
+<tr class="even">
+<td>Institutions above it</td>
+<td>Every direct parent</td>
+<td>Only if the agreement lists at least two institutions whose only
+parent it is (<code>parent</code>); otherwise stored as
+<code>parent_single</code> and not counted</td>
+</tr>
+<tr class="odd">
+<td>Related institutions</td>
+<td>Count</td>
+<td>Stored as <code>related</code>, not counted</td>
+</tr>
+<tr class="even">
+<td>Participant lists</td>
+<td>JCT</td>
+<td>JCT, with curated corrections
+(<code>data-raw/manual/institution_corrections.csv</code>)</td>
+</tr>
+<tr class="odd">
+<td>Agreement period checked with</td>
+<td>Crossref <code>issued</code>
+</td>
+<td>OpenAlex publication date</td>
+</tr>
+<tr class="even">
+<td>Journals</td>
+<td>Hybrid journals</td>
+<td>Hybrid and fully OA journals</td>
+</tr>
+</tbody>
+</table>
+<p>hoaddata 0.3 took every institution OpenAlex lists as associated with
+a participating one, whatever the relationship. Where OpenAlex lists
+many parents, this made authors eligible who are not covered: European
+XFEL has 14 parents in OpenAlex, its shareholders such as CNRS, INFN and
+CEA, so their authors counted under every agreement listing European
+XFEL. Likewise, universities that run joint institutes with CSIC made
+all their authors eligible under CSIC’s agreements. jnanalytics
+therefore counts fewer works through parents and related institutions,
+and more through institutions further below a participating one.</p>
 </div>
 <div class="section level2">
 <h2 id="columns">Columns<a class="anchor" aria-label="anchor" href="#columns"></a>
@@ -774,8 +850,8 @@ Available in: Hugging Face, BigQuery.</p>
 <table class="table">
 <colgroup>
 <col width="2%">
-<col width="2%">
-<col width="94%">
+<col width="1%">
+<col width="95%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Column</th>
@@ -828,12 +904,14 @@ URL</td>
 participating one, per OpenAlex: <code>direct</code> (same),
 <code>child</code> (part of it, any depth), <code>parent</code> (the
 author’s institution contains it, and the agreement lists at least two
-institutions it contains), <code>parent_single</code> (contains it, but
-it is the only one listed, e.g. a shareholder of European XFEL) or
-<code>related</code>. <code>direct</code>, <code>child</code> and
-<code>parent</code> count in <code>agreement_journal_year</code>;
-<code>parent_single</code> and <code>related</code> are kept for
-comparison (hoaddata 0.3 counted <code>related</code> too)</td>
+institutions whose only parent it is), <code>parent_single</code>
+(contains it, but without such evidence of an umbrella organisation,
+e.g. a shareholder of European XFEL or a university running a joint
+institute with CSIC) or <code>related</code>. <code>direct</code>,
+<code>child</code> and <code>parent</code> count in
+<code>agreement_journal_year</code>; <code>parent_single</code> and
+<code>related</code> are kept for comparison (hoaddata 0.3 counted
+<code>related</code> too)</td>
 </tr>
 </tbody>
 </table>

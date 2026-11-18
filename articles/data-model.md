@@ -71,19 +71,21 @@ metadata.
   period, and its first author’s OpenAlex institution is a participating
   institution, one of its children or its parent (`direct`, `child`,
   `parent`). A parent counts only if the agreement lists at least two
-  institutions below it, as for an author who gives only “CSIC” or
-  “Leibniz Association”; with one listed institution the match is
-  `parent_single` and does not count (ROR and OpenAlex list the 15
-  shareholders of European XFEL, among them CNRS and INFN, as its
-  parents). `parent_single` and `related` matches are kept in
-  `article_agreements` but not counted. `agreement_articles` lists the
-  counted works per participating institution, and
-  `agreement_institution_year` sums them; a work whose first author has
-  two participating institutions counts for both, so take agreement
-  totals from `agreement_journal_year`. Agreements missing from ESAC get
-  an inferred period (`agreements.is_period_inferred`). Participating
-  institutions come from the JCT; where it is wrong, a curated
-  correction with its source adds or removes institutions
+  institutions whose only parent it is, as for an author who gives only
+  “CSIC” or “Chinese Academy of Sciences”; otherwise the match is
+  `parent_single` and does not count. This leaves out the shareholders
+  that OpenAlex lists as parents of European XFEL (among them CNRS and
+  INFN) and universities that run joint institutes with CSIC, whose
+  authors are not covered by CSIC’s agreements. `parent_single` and
+  `related` matches are kept in `article_agreements` but not counted.
+  `agreement_articles` lists the counted works per participating
+  institution, and `agreement_institution_year` sums them; a work whose
+  first author has two participating institutions counts for both, so
+  take agreement totals from `agreement_journal_year`. Agreements
+  missing from ESAC get an inferred period
+  (`agreements.is_period_inferred`). Participating institutions come
+  from the JCT; where it is wrong, a curated correction with its source
+  adds or removes institutions
   (`data-raw/manual/institution_corrections.csv`, for example
   `ieee2025cas`).
 - **Journals of an agreement.** Journal-level statistics per agreement
@@ -96,6 +98,33 @@ metadata.
   journals, years and work types. Shares are not stored; compute them,
   for example `articles_oa / articles` or, for Crossref metadata,
   `articles_with_orcid / articles_in_crossref`.
+
+## Differences from hoaddata 0.3
+
+jnanalytics succeeds hoaddata 0.3, which remains available unchanged.
+Agreement coverage is counted differently, so the numbers are not
+directly comparable:
+
+|  | hoaddata 0.3 | jnanalytics |
+|----|----|----|
+| Author | First author’s OpenAlex institutions | Same |
+| Participating institution itself | Counts | Counts (`direct`) |
+| Institutions below it | Direct children only | Any depth, from the OpenAlex `lineage` (`child`) |
+| Institutions above it | Every direct parent | Only if the agreement lists at least two institutions whose only parent it is (`parent`); otherwise stored as `parent_single` and not counted |
+| Related institutions | Count | Stored as `related`, not counted |
+| Participant lists | JCT | JCT, with curated corrections (`data-raw/manual/institution_corrections.csv`) |
+| Agreement period checked with | Crossref `issued` | OpenAlex publication date |
+| Journals | Hybrid journals | Hybrid and fully OA journals |
+
+hoaddata 0.3 took every institution OpenAlex lists as associated with a
+participating one, whatever the relationship. Where OpenAlex lists many
+parents, this made authors eligible who are not covered: European XFEL
+has 14 parents in OpenAlex, its shareholders such as CNRS, INFN and CEA,
+so their authors counted under every agreement listing European XFEL.
+Likewise, universities that run joint institutes with CSIC made all
+their authors eligible under CSIC’s agreements. jnanalytics therefore
+counts fewer works through parents and related institutions, and more
+through institutions further below a participating one.
 
 ## Columns
 
@@ -229,7 +258,7 @@ Available in: Hugging Face, BigQuery.
 | `author_role` | string, key | `corresponding` or `first`: the author whose institution matched. A first author who is also corresponding author gives one row per role |
 | `ror_author` | string, key | ROR ID of the author’s institution (OpenAlex), full URL |
 | `ror_agreement` | string, key | ROR ID of the participating institution it matched |
-| `match_type` | string | How the author’s institution relates to the participating one, per OpenAlex: `direct` (same), `child` (part of it, any depth), `parent` (the author’s institution contains it, and the agreement lists at least two institutions it contains), `parent_single` (contains it, but it is the only one listed, e.g. a shareholder of European XFEL) or `related`. `direct`, `child` and `parent` count in `agreement_journal_year`; `parent_single` and `related` are kept for comparison (hoaddata 0.3 counted `related` too) |
+| `match_type` | string | How the author’s institution relates to the participating one, per OpenAlex: `direct` (same), `child` (part of it, any depth), `parent` (the author’s institution contains it, and the agreement lists at least two institutions whose only parent it is), `parent_single` (contains it, but without such evidence of an umbrella organisation, e.g. a shareholder of European XFEL or a university running a joint institute with CSIC) or `related`. `direct`, `child` and `parent` count in `agreement_journal_year`; `parent_single` and `related` are kept for comparison (hoaddata 0.3 counted `related` too) |
 
 ### agreement_articles
 
