@@ -22,6 +22,8 @@ Every other table joins to them by `issn_l` or `agreement_id`.
 
 The same functions run on the Parquet files and on BigQuery.
 
+- [`jn_download()`](https://njahn82.github.io/jn_analytics/reference/jn_download.md)
+  : Download the jnanalytics data
 - [`jn_oa()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)
   [`jn_licenses()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)
   [`jn_metadata()`](https://njahn82.github.io/jn_analytics/reference/jn_oa.md)

@@ -30,6 +30,16 @@ stays available unchanged for code that relies on its tables.
   that documents every table, column and counting rule from the schema;
   deployed to GitHub Pages by `pkgdown.yaml`.
 
+- New
+  [`jn_download()`](https://njahn82.github.io/jn_analytics/reference/jn_download.md)
+  fetches a release from Hugging Face into a folder (`my_data` by
+  default), updates it when a new release is out or keeps it frozen at
+  one release, and returns it as a source for the analysis functions. By
+  default it leaves out the large article tables.
+  [`jn_source()`](https://njahn82.github.io/jn_analytics/reference/jn_source.md)
+  says once per session when a downloaded folder is behind the latest
+  release (`options(jnanalytics.check_updates = FALSE)` turns it off).
+
 - All tables, including the article tables, are published as Parquet
   files in the Hugging Face dataset `najkoja/jn_analytics`, one tagged
   commit per release (named after the build date), with a generated

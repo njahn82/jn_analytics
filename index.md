@@ -31,7 +31,7 @@ devtools::install()
 | Layer | Tables | How |
 |----|----|----|
 | Package data | Reference tables: `journals`, `journal_issns`, `agreements`, `agreement_journals`, `agreement_institutions`, `portfolios` | [`library(jnanalytics)`](https://github.com/njahn82/jn_analytics) |
-| Hugging Face dataset [`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics) | All tables as Parquet, article tables split by year, one tagged version per release | `hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data`, then `jn_source("jn_data")`; or read single files with DuckDB, Python or arrow |
+| Hugging Face dataset [`najkoja/jn_analytics`](https://huggingface.co/datasets/najkoja/jn_analytics) | All tables as Parquet, article tables split by year, one tagged version per release | `src <- jn_download()` (downloads into `my_data/`, updates on new releases, or freezes with `release =`); or read single files with DuckDB, Python or arrow |
 | BigQuery `subugoe-collaborative.jn_analytics` | All tables | `jn_source("bigquery")` |
 
 ## Examples
@@ -43,7 +43,7 @@ BigQuery. By default they count research articles (OpenAlex types
 ``` r
 
 library(jnanalytics)
-src <- jn_source("jn_data")
+src <- jn_download()
 
 # Open access in hybrid and fully OA journals over time
 jn_oa(src, by = c("pub_year", "oa_model"))

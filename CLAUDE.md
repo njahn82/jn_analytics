@@ -115,6 +115,12 @@ pkgdown::build_site()                # website into docs/
   as one file per year (`articles/articles_2025.parquet`);
   `article_first_authors` and `article_agreements` carry `pub_year` for
   this.
+- Users get the data with
+  [`jn_download()`](https://njahn82.github.io/jn_analytics/reference/jn_download.md)
+  (folder `my_data` by default, `jn_release.json` records
+  release/commit/frozen; updates unless frozen; skips the large article
+  tables by default) and get its
+  [`jn_source()`](https://njahn82.github.io/jn_analytics/reference/jn_source.md).
 - BigQuery access through bigrquery only (no bigrquerystorage).
 - The `build` workflow is started by hand (roughly quarterly); no cron.
 

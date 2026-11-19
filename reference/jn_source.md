@@ -1,10 +1,13 @@
 # Connect to the jnanalytics tables
 
 The analysis functions read from a source: a folder of Parquet files as
+downloaded by
+[`jn_download()`](https://njahn82.github.io/jn_analytics/reference/jn_download.md)
+(which returns its source, so most users never call `jn_source()`) or
 written by
-[`jn_publish()`](https://njahn82.github.io/jn_analytics/reference/jn_publish.md)
-or downloaded from Hugging Face, or the BigQuery dataset. A table is
-either one file (`journal_year.parquet`) or a folder of files
+[`jn_publish()`](https://njahn82.github.io/jn_analytics/reference/jn_publish.md),
+or the BigQuery dataset. A table is either one file
+(`journal_year.parquet`) or a folder of files
 (`articles/articles_2025.parquet`, ...); a download of only some tables
 or years works too.
 
@@ -42,12 +45,18 @@ jn_tbl(src, table)
 A `jn_source` object. `jn_tbl()` returns one of its tables as a lazy
 table that dplyr verbs can be applied to.
 
+## Details
+
+For a folder from
+[`jn_download()`](https://njahn82.github.io/jn_analytics/reference/jn_download.md),
+`jn_source()` says once per session if a newer release is available.
+Turn this off with `options(jnanalytics.check_updates = FALSE)`.
+
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-# hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
-src <- jn_source("jn_data")
+src <- jn_source("my_data")
 jn_tbl(src, "journal_year")
 jn_tbl(src, "articles") |>
   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
