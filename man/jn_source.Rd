@@ -24,15 +24,20 @@ lazy table that dplyr verbs can be applied to.
 }
 \description{
 The analysis functions read from a source: a folder of Parquet files as
-written by \code{\link[=jn_publish]{jn_publish()}} or downloaded from Hugging Face, or the BigQuery
+downloaded by \code{\link[=jn_download]{jn_download()}} (which returns its source, so most users
+never call \code{jn_source()}) or written by \code{\link[=jn_publish]{jn_publish()}}, or the BigQuery
 dataset. A table is either one file (\code{journal_year.parquet}) or a folder
 of files (\code{articles/articles_2025.parquet}, ...); a download of only some
 tables or years works too.
 }
+\details{
+For a folder from \code{\link[=jn_download]{jn_download()}}, \code{jn_source()} says once per session if
+a newer release is available. Turn this off with
+\code{options(jnanalytics.check_updates = FALSE)}.
+}
 \examples{
 \dontrun{
-# hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
-src <- jn_source("jn_data")
+src <- jn_source("my_data")
 jn_tbl(src, "journal_year")
 jn_tbl(src, "articles") |>
   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>

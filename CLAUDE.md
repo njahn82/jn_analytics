@@ -100,6 +100,9 @@ pkgdown::build_site()                # website into docs/
 - Article tables are partitioned by `pub_year` in BigQuery and exported as
   one file per year (`articles/articles_2025.parquet`); `article_first_authors`
   and `article_agreements` carry `pub_year` for this.
+- Users get the data with `jn_download()` (folder `my_data` by default,
+  `jn_release.json` records release/commit/frozen; updates unless frozen;
+  skips the large article tables by default) and get its `jn_source()`.
 - BigQuery access through bigrquery only (no bigrquerystorage).
 - The `build` workflow is started by hand (roughly quarterly); no cron.
 

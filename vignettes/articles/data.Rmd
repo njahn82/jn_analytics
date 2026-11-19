@@ -131,27 +131,33 @@ GROUP BY ALL;
 
 ### R, with jnanalytics
 
-Download the dataset with the [Hugging Face
-CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) (`brew install
-hf` or `pipx install huggingface_hub`), all of it or only some tables:
-
-```sh
-hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
-hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data \
-  --include "journal*.parquet" "agreement*.parquet" "portfolios.parquet" "release.parquet"
-```
-
-Then use the analysis functions; the article tables work too:
+`jn_download()` fetches the data into a folder (`my_data` by default),
+updates it when a new release comes out, and returns it for the analysis
+functions. By default it leaves out the large article tables (about 84 MB
+instead of 1 GB); `tables = "all"` includes them.
 
 ```{r, echo = TRUE, eval = FALSE}
 library(jnanalytics)
-src <- jn_source("jn_data")
+src <- jn_download()
 jn_oa(src, by = c("pub_year", "oa_model"))
 
-jn_tbl(src, "articles") |>
-  dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
-  dplyr::collect()
+# Freeze a project to one release; later calls do not update it
+src <- jn_download(release = "2026-11-18")
 ```
+
+### Hugging Face CLI
+
+With the [Hugging Face
+CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) (`brew install
+hf` or `pipx install huggingface_hub`); give each pattern its own
+`--exclude` or `--include`:
+
+```sh
+hf download najkoja/jn_analytics --repo-type dataset --local-dir my_data \
+  --exclude "articles/*" --exclude "article_first_authors/*" --exclude "article_agreements/*"
+```
+
+Then `jnanalytics::jn_source("my_data")` reads the folder.
 
 ### R, with arrow
 

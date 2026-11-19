@@ -57,6 +57,7 @@ reference:
     desc: >
       The same functions run on the Parquet files and on BigQuery.
     contents:
+      - jn_download
       - jn_oa
       - jn_source
 

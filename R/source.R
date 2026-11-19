@@ -1,10 +1,15 @@
 #' Connect to the jnanalytics tables
 #'
 #' The analysis functions read from a source: a folder of Parquet files as
-#' written by [jn_publish()] or downloaded from Hugging Face, or the BigQuery
+#' downloaded by [jn_download()] (which returns its source, so most users
+#' never call `jn_source()`) or written by [jn_publish()], or the BigQuery
 #' dataset. A table is either one file (`journal_year.parquet`) or a folder
 #' of files (`articles/articles_2025.parquet`, ...); a download of only some
 #' tables or years works too.
+#'
+#' For a folder from [jn_download()], `jn_source()` says once per session if
+#' a newer release is available. Turn this off with
+#' `options(jnanalytics.check_updates = FALSE)`.
 #'
 #' @param x A directory with Parquet files, or `"bigquery"`.
 #' @param config See [jn_bq_config()]. Used for BigQuery only.
@@ -14,8 +19,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # hf download najkoja/jn_analytics --repo-type dataset --local-dir jn_data
-#' src <- jn_source("jn_data")
+#' src <- jn_source("my_data")
 #' jn_tbl(src, "journal_year")
 #' jn_tbl(src, "articles") |>
 #'   dplyr::filter(issn_l == "0360-0300", pub_year == 2025) |>
@@ -42,8 +46,9 @@ jn_source <- function(x = "parquet", config = jn_bq_config()) {
   }
   rlang::check_installed("arrow")
   if (!dir.exists(x)) {
-    cli::cli_abort("Directory {.path {x}} not found. Run {.fn jn_publish} first.")
+    cli::cli_abort("Directory {.path {x}} not found. Download the data with {.fn jn_download} first.")
   }
+  check_download_update(x)
   tables <- intersect(jn_tables(), unique(export_files(x)$table))
   structure(
     list(type = "parquet", path = x, tables = tables),
